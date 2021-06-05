@@ -8,12 +8,14 @@ import config
 from proxy_filter import filter_proxy, Proxy
 
 
-# sslproxies.org
-# only https proxies
-def scrape_sslproxies_org():
+# general scraper
+## free-proxy-list.net
+## sslproxies.org
+## us-proxy.org
+def scrape_http_pool(url):
     if 'http' not in config.proxy_type and 'https' not in config.proxy_type:
         return
-    page = requests.get('https://sslproxies.org')
+    page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
     table = soup.find('table', attrs={'address': 'proxylisttable'})
     for row in table.find_all("tr"):
@@ -23,10 +25,27 @@ def scrape_sslproxies_org():
             address += ':' + cells[1].text
             proxy = Proxy()
             proxy.address = address.replace('&nbsp;', '')
-            proxy.country = cells[2].text.replace('&nbsp;', '').upper()
+            proxy.type = 'https' if 'yes' in cells[6].text else 'http'
             proxy.anonymity = cells[4].text.replace('&nbsp;', '').replace(' proxy', '')
-            proxy.type = 'https'
+            proxy.country = cells[2].text.replace('&nbsp;', '').upper()
             filter_proxy(proxy)
+
+
+# sslproxies.org
+def scrape_sslproxies_org():
+    scrape_http_pool('https://sslproxies.org')
+
+
+# us-proxy.org
+def scrape_us_proxy_org():
+    scrape_http_pool('https://us-proxy.org/')
+
+
+# free-proxy-list.net
+def scrape_free_proxy_list_net():
+    scrape_http_pool('https://free-proxy-list.net/anonymous-proxy.html')
+    scrape_http_pool('https://free-proxy-list.net/uk-proxy.html')
+    scrape_http_pool('https://free-proxy-list.net')
 
 
 def product_with_empty(*iterables):
@@ -68,4 +87,6 @@ def scrape_proxy_list_download():
 
 
 Thread(scrape_sslproxies_org()).start()
+Thread(scrape_us_proxy_org()).start()
+Thread(scrape_free_proxy_list_net()).start()
 Thread(scrape_proxy_list_download()).start()
