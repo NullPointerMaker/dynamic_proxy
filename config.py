@@ -1,5 +1,4 @@
-# type not set = all
-# not support http without ssl
+# type can not be null
 # socks include socks4, socks5
 # socks4 include socks4a
 proxy_type = ('https', 'socks', 'socks4', 'socks4a', 'socks5')
@@ -7,6 +6,6 @@ proxy_type = ('https', 'socks', 'socks4', 'socks4a', 'socks5')
 proxy_anonymity = ('anonymous', 'elite')
 # country not set = all
 proxy_country = ()
-proxy_country_exclude = 'cn'
+proxy_country_exclude = ('CN', 'MO')
 
-datebase_file = 'pool.db'
+database_file = 'pool.db'

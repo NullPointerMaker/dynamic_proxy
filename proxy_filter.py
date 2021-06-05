@@ -1,8 +1,9 @@
+from geoip2.database import Reader as IPDatabase
 from peewee import SqliteDatabase, Model, CharField, FixedCharField, IntegrityError
 
 import config
 
-db = SqliteDatabase(config.datebase_file)
+db = SqliteDatabase(config.database_file)
 
 
 class Proxy(Model):
@@ -19,6 +20,11 @@ Proxy.create_table()
 
 
 def filter_proxy(proxy: Proxy):
+    if 'socks' in proxy.type and not proxy.anonymity:
+        proxy.anonymity = 'elite'
+    if not proxy.country:
+        with IPDatabase('/path/to/GeoLite2-City.mmdb') as ip:
+            proxy.country = ip.country.iso_code
     if config.proxy_type and proxy.type not in config.proxy_type:
         return
     if config.proxy_anonymity and proxy.anonymity not in config.proxy_anonymity:
