@@ -8,12 +8,32 @@ import config
 from proxy_filter import filter_proxy, Proxy
 
 
+# socks-proxy.net
+def scrape_socks_proxy_net():
+    if not any('socks' in pt for pt in config.proxy_type):
+        return
+    page = requests.get('https://socks-proxy.net')
+    soup = BeautifulSoup(page.text, 'html.parser')
+    table = soup.find('table', attrs={'address': 'proxylisttable'})
+    for row in table.find_all("tr"):
+        cells = row.find_all("td")
+        if len(cells) == 8:
+            address = cells[0].text
+            address += ':' + cells[1].text
+            proxy = Proxy()
+            proxy.address = address.replace('&nbsp;', '')
+            proxy.type = cells[4].text.replace('&nbsp;', '').lower()
+            proxy.anonymity = 'elite'
+            proxy.country = cells[2].text.replace('&nbsp;', '').upper()
+            filter_proxy(proxy)
+
+
 # general scraper
-## free-proxy-list.net
-## sslproxies.org
-## us-proxy.org
+# free-proxy-list.net
+# sslproxies.org
+# us-proxy.org
 def scrape_http_pool(url):
-    if 'http' not in config.proxy_type and 'https' not in config.proxy_type:
+    if not any('http' in pt for pt in config.proxy_type):
         return
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
@@ -38,7 +58,7 @@ def scrape_sslproxies_org():
 
 # us-proxy.org
 def scrape_us_proxy_org():
-    scrape_http_pool('https://us-proxy.org/')
+    scrape_http_pool('https://us-proxy.org')
 
 
 # free-proxy-list.net
@@ -86,6 +106,7 @@ def scrape_proxy_list_download():
                 filter_proxy(proxy)
 
 
+Thread(scrape_socks_proxy_net()).start()
 Thread(scrape_sslproxies_org()).start()
 Thread(scrape_us_proxy_org()).start()
 Thread(scrape_free_proxy_list_net()).start()
