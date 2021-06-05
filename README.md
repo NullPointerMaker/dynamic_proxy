@@ -1,2 +1,2 @@
-# dynamic_proxy
-Scape, Filter, Check, Serve.
+# Dynamic Proxy
+Scrape, Filter, Check, Serve.
