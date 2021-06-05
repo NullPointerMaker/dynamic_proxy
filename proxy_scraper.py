@@ -30,10 +30,11 @@ def scrape_sslproxies_org():
 
 
 def product_with_empty(*iterables):
-    for i, val in enumerate(iterables):
-        if not val:
-            iterables[i] = [()]
-    return Product(iterables)
+    listlist = list(iterables)
+    for i, l in enumerate(listlist):
+        if not l:
+            listlist[i] = [()]
+    return Product(*listlist)
 
 
 # proxy-list.download
@@ -59,12 +60,12 @@ def scrape_proxy_list_download():
             address = line.strip()
             if address:
                 proxy = Proxy()
-                proxy.address = address;
+                proxy.address = address
                 proxy.type = p['type']
                 proxy.anonymity = p['anon']
                 proxy.country = p['country']
                 filter_proxy(proxy)
 
 
-Thread(scrape_sslproxies_org).start()
-Thread(scrape_proxy_list_download).start()
+Thread(scrape_sslproxies_org()).start()
+Thread(scrape_proxy_list_download()).start()
