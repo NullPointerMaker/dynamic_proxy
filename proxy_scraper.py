@@ -79,8 +79,6 @@ def product_with_empty(*iterables):
 # proxy-list.download
 def scrape_proxy_list_download():
     proxy_type = list(config.proxy_type)
-    proxy_type.remove('socks')
-    proxy_type.remove('socks4a')
     tuples = product_with_empty(proxy_type, config.proxy_anonymity, config.proxy_country)
     payloads = []
     for t in tuples:
