@@ -1,12 +1,11 @@
 import asyncio
 import logging
 from asyncio import StreamReader, StreamWriter, StreamReaderProtocol
-from threading import Thread
 
 import socks  # pysocks
 
 import config
-from proxy_checker import remote_proxy as proxy, check_proxy
+from proxy_checker import get_checked_proxy as checked_proxy, rotate_proxy
 
 logging.basicConfig(level=logging.INFO)
 
@@ -27,11 +26,11 @@ async def tunnel(from_client, to_client, from_server, to_server):
 async def conn_server(server_host: str, server_port: int,
                       limit=2 ** 16) -> (StreamReader, StreamWriter):
     sock = socks.socksocket()
-    sock.set_proxy(proxy_type=proxy.type,
-                   addr=proxy.host,
-                   port=proxy.port,
-                   username=proxy.username,
-                   password=proxy.password)
+    sock.set_proxy(proxy_type=checked_proxy()['type'],
+                   addr=checked_proxy()['host'],
+                   port=checked_proxy()['port'],
+                   username=checked_proxy()['username'],
+                   password=checked_proxy()['password'])
     sock.connect((server_host, server_port))
 
     loop = asyncio.get_event_loop()
@@ -88,7 +87,7 @@ async def conn_client(reader: StreamReader, writer: StreamWriter):
     asyncio.ensure_future(tunnel(from_client, to_client, from_server, to_server))
 
 
-Thread(check_proxy()).start()
+rotate_proxy()
 server = asyncio.start_server(conn_client,
                               host=config.local_host,
                               port=config.local_port,

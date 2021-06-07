@@ -19,21 +19,26 @@ class Proxy(Model):
 Proxy.create_table()
 
 
-def filter_proxy(proxy: Proxy):
+def is_valid(proxy: Proxy) -> bool:
     if 'socks' in proxy.type and not proxy.anonymity:
         proxy.anonymity = 'elite'
     if not proxy.country:
         with IPDatabase('/path/to/GeoLite2-City.mmdb') as ip:
             proxy.country = ip.country.iso_code
     if config.proxy_type and proxy.type not in config.proxy_type:
-        return
+        return False
     if config.proxy_anonymity and proxy.anonymity not in config.proxy_anonymity:
-        return
+        return False
     if config.proxy_country and proxy.country not in config.proxy_country:
-        return
+        return False
     if proxy.country in config.proxy_country_exclude:
-        return
-    try:
-        proxy.save(force_insert=True)
-    except IntegrityError:
-        pass
+        return False
+    return True
+
+
+def filter_proxy(proxy: Proxy):
+    if is_valid(proxy):
+        try:
+            proxy.save(force_insert=True)
+        except IntegrityError:
+            pass
