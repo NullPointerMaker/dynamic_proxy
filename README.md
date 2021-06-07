@@ -15,7 +15,7 @@
 1. Modify `config.py` according to your needs.
 2. Scrape proxies from multi pools:
    ```
-   python3 proxy_scraper.py
+   python3 pool_scraper.py
    ```
    If you need to run periodically, please use the job scheduler of the operating system.  
    It is recommended to scrape hourly.
