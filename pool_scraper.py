@@ -1,4 +1,4 @@
-from datetime import datetime as Datetime
+import json
 from threading import Thread
 
 import requests
@@ -40,6 +40,27 @@ def clarketm():  # github.com/clarketm/proxy-list
             proxy.type = 'https'
         else:
             proxy.type = p[2].strip()
+        filter_proxy(proxy)
+
+
+def fate0():  # github.com/fate0/proxylist
+    # as known as proxylist.fatezero.org
+    if not is_updated_github('fate0/proxylist', 'proxy.list'):
+        return
+    r = requests.get('https://github.com/fate0/proxylist/raw/master/proxy.list')
+    lines = r.text.splitlines()
+    for line in lines:
+        if not line:
+            continue
+        j = json.loads(line)
+        proxy = Proxy()
+        proxy.address = j['host'] + ':' + str(j['port'])
+        proxy.type = j['type']
+        proxy.country = j['country']
+        if 'high' in j['anonymity']:
+            proxy.anonymity = 'elite'
+        else:
+            proxy.anonymity = j['anonymity']
         filter_proxy(proxy)
 
 
@@ -104,6 +125,7 @@ def us_proxy_org():  # us-proxy.org
 
 
 Thread(clarketm()).start()
+Thread(fate0()).start()
 Thread(free_proxy_list_net()).start()
 Thread(proxy_list_download()).start()
 Thread(socks_proxy_net()).start()
