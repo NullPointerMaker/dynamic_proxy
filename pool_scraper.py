@@ -1,4 +1,4 @@
-from itertools import product as Product
+from datetime import datetime as Datetime
 from threading import Thread
 
 import requests
@@ -6,10 +6,49 @@ from bs4 import BeautifulSoup
 
 import config
 from proxy_filter import filter_proxy, Proxy
+from scraper_utils import scrape_free_proxy_list_net as fpl_n, product_with_empty
+
+
+# github.com/clarketm/proxy-list
+# spys.me
+# include:
+# pubproxy.com
+# spys.one
+def clarketm():
+    r = requests.get('https://github.com/clarketm/proxy-list/raw/master/proxy-list.txt')
+    lines = r.text.splitlines()
+    update_str = lines[0].split(',')[-1].strip()
+    update = Datetime.strptime(update_str, '%d %b %y %H:%M:%S %z')  # 08 Jun 21 17:55:01 +0300
+    now = Datetime.now()
+    if (now - update).seconds > 3600:
+        return
+    for line in lines[9:]:
+        p = line.split(' ')
+        proxy = Proxy()
+        proxy.address = p[0].strip()
+        p = p[1].split('-')
+        if not p[0]:
+            continue
+        proxy.country = p[0].strip()
+        if config.proxy_anonymity and len(p) < 2:
+            continue
+        if 'N' in p[1]:
+            proxy.anonymity = 'transparent'
+        elif 'A' in p[1]:
+            proxy.anonymity = 'anonymous'
+        elif 'H' in p[1]:
+            proxy.anonymity = 'elite'
+        if len(p) < 3:
+            proxy.type = 'http'
+        elif 'S' in p[2]:
+            proxy.type = 'https'
+        else:
+            proxy.type = p[2].strip()
+        filter_proxy(proxy)
 
 
 # socks-proxy.net
-def scrape_socks_proxy_net():
+def socks_proxy_net():
     if not any('socks' in pt for pt in config.proxy_type):
         return
     page = requests.get('https://socks-proxy.net')
@@ -28,56 +67,25 @@ def scrape_socks_proxy_net():
             filter_proxy(proxy)
 
 
-# general scraper
-# free-proxy-list.net
 # sslproxies.org
-# us-proxy.org
-def scrape_http_pool(url):
-    if not any('http' in pt for pt in config.proxy_type):
-        return
-    page = requests.get(url)
-    soup = BeautifulSoup(page.text, 'html.parser')
-    table = soup.find('table', attrs={'address': 'proxylisttable'})
-    for row in table.find_all("tr"):
-        cells = row.find_all("td")
-        if len(cells) == 8:
-            address = cells[0].text
-            address += ':' + cells[1].text
-            proxy = Proxy()
-            proxy.address = address.replace('&nbsp;', '')
-            proxy.type = 'https' if 'yes' in cells[6].text else 'http'
-            proxy.anonymity = cells[4].text.replace('&nbsp;', '').replace(' proxy', '')
-            proxy.country = cells[2].text.replace('&nbsp;', '').upper()
-            filter_proxy(proxy)
-
-
-# sslproxies.org
-def scrape_sslproxies_org():
-    scrape_http_pool('https://sslproxies.org')
+def sslproxies_org():
+    fpl_n('https://sslproxies.org')
 
 
 # us-proxy.org
-def scrape_us_proxy_org():
-    scrape_http_pool('https://us-proxy.org')
+def us_proxy_org():
+    fpl_n('https://us-proxy.org')
 
 
 # free-proxy-list.net
-def scrape_free_proxy_list_net():
-    scrape_http_pool('https://free-proxy-list.net/anonymous-proxy.html')
-    scrape_http_pool('https://free-proxy-list.net/uk-proxy.html')
-    scrape_http_pool('https://free-proxy-list.net')
-
-
-def product_with_empty(*iterables):
-    listlist = list(iterables)
-    for i, l in enumerate(listlist):
-        if not l:
-            listlist[i] = [()]
-    return Product(*listlist)
+def free_proxy_list_net():
+    fpl_n('https://free-proxy-list.net/anonymous-proxy.html')
+    fpl_n('https://free-proxy-list.net/uk-proxy.html')
+    fpl_n('https://free-proxy-list.net')
 
 
 # proxy-list.download
-def scrape_proxy_list_download():
+def proxy_list_download():
     proxy_type = list(config.proxy_type)
     tuples = product_with_empty(proxy_type, config.proxy_anonymity, config.proxy_country)
     payloads = []
@@ -104,8 +112,8 @@ def scrape_proxy_list_download():
                 filter_proxy(proxy)
 
 
-Thread(scrape_socks_proxy_net()).start()
-Thread(scrape_sslproxies_org()).start()
-Thread(scrape_us_proxy_org()).start()
-Thread(scrape_free_proxy_list_net()).start()
-Thread(scrape_proxy_list_download()).start()
+Thread(socks_proxy_net()).start()
+Thread(sslproxies_org()).start()
+Thread(us_proxy_org()).start()
+Thread(free_proxy_list_net()).start()
+Thread(proxy_list_download()).start()
