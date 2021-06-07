@@ -1,5 +1,5 @@
-from itertools import product as Product
 from datetime import datetime as Datetime
+from itertools import product as Product
 
 import requests
 from bs4 import BeautifulSoup
@@ -42,8 +42,12 @@ def product_with_empty(*iterables):
     return Product(*lists)
 
 
+def is_updated(timestamp: Datetime) -> bool:
+    now = Datetime.now()
+    return (now - timestamp).seconds < 3600
+
+
 def is_updated_github(repo: str, path: str) -> bool:
     repo: Repository = Github().get_repo(repo)
     commits: PaginatedList[Commit] = repo.get_commits(path=path)
-    now = Datetime.now()
-    return (now - commits[0].commit.author.date).seconds < 3600
+    return is_updated(commits[0].commit.author.date)

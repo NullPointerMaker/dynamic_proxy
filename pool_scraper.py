@@ -1,4 +1,5 @@
 import json
+from datetime import datetime as Datetime
 from threading import Thread
 
 import requests
@@ -6,7 +7,7 @@ from bs4 import BeautifulSoup
 
 import config
 from proxy_filter import filter_proxy, Proxy
-from scraper_utils import scrape_free_proxy_list_net, product_with_empty, is_updated_github
+from scraper_utils import scrape_free_proxy_list_net, product_with_empty, is_updated_github, is_updated
 
 
 def clarketm():  # github.com/clarketm/proxy-list
@@ -70,6 +71,24 @@ def free_proxy_list_net():  # free-proxy-list.net
     scrape_free_proxy_list_net('https://free-proxy-list.net')
 
 
+def hookzof():  # github.com/hookzof/socks5_list
+    if not is_updated_github('hookzof/socks5_list', 'tg/socks.json'):
+        return
+    r = requests.get('https://github.com/hookzof/socks5_list/raw/master/tg/socks.json')
+    jsons = r.json()
+    for j in jsons:
+        timestamp = int(j['unix'])
+        dt = Datetime.fromtimestamp(timestamp)
+        if not is_updated(dt):
+            continue
+        proxy = Proxy()
+        proxy.address = j['ip'] + ':' + j['port']
+        proxy.type = 'socks5'
+        proxy.country = j['country']
+        proxy.anonymity = 'elite'
+        filter_proxy(proxy)
+
+
 def proxy_list_download():  # proxy-list.download
     proxy_type = list(config.proxy_type)
     tuples = product_with_empty(proxy_type, config.proxy_anonymity, config.proxy_country)
@@ -127,6 +146,7 @@ def us_proxy_org():  # us-proxy.org
 Thread(clarketm()).start()
 Thread(fate0()).start()
 Thread(free_proxy_list_net()).start()
+Thread(hookzof()).start()
 Thread(proxy_list_download()).start()
 Thread(socks_proxy_net()).start()
 Thread(sslproxies_org()).start()

@@ -31,6 +31,7 @@
   * spys.one
 * [clarketm/proxy-list](https://github.com/fate0/proxylist) (as known as proxylist.fatezero.org)
 * free-proxy-list.net (include several subsites)
+* [hookzof/socks5_list](https://github.com/hookzof/socks5_list)
 * proxylist.download
 * socks-proxy.net (a subsite of free-proxy-list.net)
 * sslproxies.org (a subsite of free-proxy-list.net)
