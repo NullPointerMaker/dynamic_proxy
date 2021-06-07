@@ -1,7 +1,12 @@
 from itertools import product as Product
+from datetime import datetime as Datetime
 
 import requests
 from bs4 import BeautifulSoup
+from github import Github
+from github.Commit import Commit
+from github.PaginatedList import PaginatedList
+from github.Repository import Repository
 
 import config
 from proxy_filter import Proxy, filter_proxy
@@ -35,3 +40,10 @@ def product_with_empty(*iterables):
         if not l:
             lists[i] = [()]
     return Product(*lists)
+
+
+def is_updated_github(repo: str, path: str) -> bool:
+    repo: Repository = Github().get_repo(repo)
+    commits: PaginatedList[Commit] = repo.get_commits(path=path)
+    now = Datetime.now()
+    return (now - commits[0].commit.author.date).seconds < 3600

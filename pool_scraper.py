@@ -14,13 +14,10 @@ def clarketm():  # github.com/clarketm/proxy-list
     # include:
     # pubproxy.com
     # spys.one
+    if not is_updated_github('clarketm/proxy-list', 'proxy-list.txt'):
+        return
     r = requests.get('https://github.com/clarketm/proxy-list/raw/master/proxy-list.txt')
     lines = r.text.splitlines()
-    update_str = lines[0].split(',')[-1].strip()
-    update = Datetime.strptime(update_str, '%d %b %y %H:%M:%S %z')  # 08 Jun 21 17:55:01 +0300
-    now = Datetime.now()
-    if (now - update).seconds > 3600:
-        return
     for line in lines[9:]:
         p = line.split(' ')
         proxy = Proxy()
