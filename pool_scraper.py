@@ -9,12 +9,11 @@ from proxy_filter import filter_proxy, Proxy
 from scraper_utils import scrape_free_proxy_list_net as fpl_n, product_with_empty
 
 
-# github.com/clarketm/proxy-list
-# spys.me
-# include:
-# pubproxy.com
-# spys.one
-def clarketm():
+def clarketm():  # github.com/clarketm/proxy-list
+    # as known as spys.me
+    # include:
+    # pubproxy.com
+    # spys.one
     r = requests.get('https://github.com/clarketm/proxy-list/raw/master/proxy-list.txt')
     lines = r.text.splitlines()
     update_str = lines[0].split(',')[-1].strip()
@@ -47,45 +46,13 @@ def clarketm():
         filter_proxy(proxy)
 
 
-# socks-proxy.net
-def socks_proxy_net():
-    if not any('socks' in pt for pt in config.proxy_type):
-        return
-    page = requests.get('https://socks-proxy.net')
-    soup = BeautifulSoup(page.text, 'html.parser')
-    table = soup.find('table', attrs={'address': 'proxylisttable'})
-    for row in table.find_all("tr"):
-        cells = row.find_all("td")
-        if len(cells) == 8:
-            address = cells[0].text
-            address += ':' + cells[1].text
-            proxy = Proxy()
-            proxy.address = address.replace('&nbsp;', '')
-            proxy.type = cells[4].text.replace('&nbsp;', '').lower()
-            proxy.anonymity = 'elite'
-            proxy.country = cells[2].text.replace('&nbsp;', '').upper()
-            filter_proxy(proxy)
-
-
-# sslproxies.org
-def sslproxies_org():
-    fpl_n('https://sslproxies.org')
-
-
-# us-proxy.org
-def us_proxy_org():
-    fpl_n('https://us-proxy.org')
-
-
-# free-proxy-list.net
-def free_proxy_list_net():
+def free_proxy_list_net():  # free-proxy-list.net
     fpl_n('https://free-proxy-list.net/anonymous-proxy.html')
     fpl_n('https://free-proxy-list.net/uk-proxy.html')
     fpl_n('https://free-proxy-list.net')
 
 
-# proxy-list.download
-def proxy_list_download():
+def proxy_list_download():  # proxy-list.download
     proxy_type = list(config.proxy_type)
     tuples = product_with_empty(proxy_type, config.proxy_anonymity, config.proxy_country)
     payloads = []
@@ -112,8 +79,36 @@ def proxy_list_download():
                 filter_proxy(proxy)
 
 
+def socks_proxy_net():  # socks-proxy.net
+    if not any('socks' in pt for pt in config.proxy_type):
+        return
+    page = requests.get('https://socks-proxy.net')
+    soup = BeautifulSoup(page.text, 'html.parser')
+    table = soup.find('table', attrs={'address': 'proxylisttable'})
+    for row in table.find_all("tr"):
+        cells = row.find_all("td")
+        if len(cells) == 8:
+            address = cells[0].text
+            address += ':' + cells[1].text
+            proxy = Proxy()
+            proxy.address = address.replace('&nbsp;', '')
+            proxy.type = cells[4].text.replace('&nbsp;', '').lower()
+            proxy.anonymity = 'elite'
+            proxy.country = cells[2].text.replace('&nbsp;', '').upper()
+            filter_proxy(proxy)
+
+
+def sslproxies_org():  # sslproxies.org
+    fpl_n('https://sslproxies.org')
+
+
+def us_proxy_org():  # us-proxy.org
+    fpl_n('https://us-proxy.org')
+
+
+Thread(clarketm()).start()
+Thread(free_proxy_list_net()).start()
+Thread(proxy_list_download()).start()
 Thread(socks_proxy_net()).start()
 Thread(sslproxies_org()).start()
 Thread(us_proxy_org()).start()
-Thread(free_proxy_list_net()).start()
-Thread(proxy_list_download()).start()

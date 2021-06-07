@@ -7,10 +7,10 @@ import config
 from proxy_filter import Proxy, filter_proxy
 
 
-# free-proxy-list.net
-# sslproxies.org
-# us-proxy.org
-def scrape_free_proxy_list_net(url):
+def scrape_free_proxy_list_net(url: str):  # free-proxy-list.net
+    # include:
+    # sslproxies.org
+    # us-proxy.org
     if not any('http' in pt for pt in config.proxy_type):
         return
     page = requests.get(url)
