@@ -26,13 +26,13 @@
    Which will tunnel to a random proxy from those scraped before, rotate periodically.
 
 ## Pools
-* [clarketm/proxy-list](https://github.com/clarketm/proxy-list) (as known as spys.me)  
+* [clarketm/proxy-list](https://github.com/clarketm/proxy-list) (AKA spys.me)  
   * pubproxy.com
   * spys.one
-* [clarketm/proxy-list](https://github.com/fate0/proxylist) (as known as proxylist.fatezero.org)
+* [fate0/proxylist](https://github.com/fate0/proxylist) (AKA proxylist.fatezero.org)
 * free-proxy-list.net (include several subsites)
 * [hookzof/socks5_list](https://github.com/hookzof/socks5_list)
 * proxylist.download
-* socks-proxy.net (a subsite of free-proxy-list.net)
-* sslproxies.org (a subsite of free-proxy-list.net)
-* us-proxy.org (a subsite of free-proxy-list.net)
+* socks-proxy.net (subsite of free-proxy-list.net)
+* sslproxies.org (subsite of free-proxy-list.net)
+* us-proxy.org (subsite of free-proxy-list.net)
