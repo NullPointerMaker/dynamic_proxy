@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 import config
 from proxy_filter import filter_proxy, Proxy
-from scraper_utils import scrape_free_proxy_list_net as fpl_n, product_with_empty
+from scraper_utils import scrape_free_proxy_list_net, product_with_empty, is_updated_github
 
 
 def clarketm():  # github.com/clarketm/proxy-list
@@ -47,9 +47,9 @@ def clarketm():  # github.com/clarketm/proxy-list
 
 
 def free_proxy_list_net():  # free-proxy-list.net
-    fpl_n('https://free-proxy-list.net/anonymous-proxy.html')
-    fpl_n('https://free-proxy-list.net/uk-proxy.html')
-    fpl_n('https://free-proxy-list.net')
+    scrape_free_proxy_list_net('https://free-proxy-list.net/anonymous-proxy.html')
+    scrape_free_proxy_list_net('https://free-proxy-list.net/uk-proxy.html')
+    scrape_free_proxy_list_net('https://free-proxy-list.net')
 
 
 def proxy_list_download():  # proxy-list.download
@@ -99,11 +99,11 @@ def socks_proxy_net():  # socks-proxy.net
 
 
 def sslproxies_org():  # sslproxies.org
-    fpl_n('https://sslproxies.org')
+    scrape_free_proxy_list_net('https://sslproxies.org')
 
 
 def us_proxy_org():  # us-proxy.org
-    fpl_n('https://us-proxy.org')
+    scrape_free_proxy_list_net('https://us-proxy.org')
 
 
 Thread(clarketm()).start()
