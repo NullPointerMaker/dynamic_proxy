@@ -78,7 +78,7 @@ def rotate_proxy():
     while not cp:
         cp = check_proxy()
 
-    proxy_type = ''
+    proxy_type = 0
     if 'http' in cp.type:
         proxy_type = socks.PROXY_TYPE_HTTP
     elif 'socks4' in cp.type:
