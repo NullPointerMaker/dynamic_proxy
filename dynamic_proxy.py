@@ -49,7 +49,8 @@ def get_conn_prop(headers: list[bytes]) -> (bool, str, int):
         host, port = url.split(':', 1)
     else:
         host_port: str = ''
-        for h in headers[1:]:
+        headers = headers[1:]
+        for h in headers:
             header = h.decode().strip()
             if header[0:5].upper() != 'HOST:':
                 continue
