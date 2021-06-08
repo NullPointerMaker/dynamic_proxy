@@ -28,6 +28,24 @@ def get_local_ip() -> str:
 local_ip = get_local_ip()
 
 
+def check_access(proxies: dict) -> bool:
+    try:
+        r = requests.options('http://twitter.com', proxies=proxies)
+        return r.status_code > 0
+    except RequestException:  # bad proxy
+        return False
+
+
+def check_ssl(proxies: dict) -> bool:
+    if 'http' in config.proxy_type:  # accept plain
+        return True
+    try:
+        r = requests.options('https://httpbin.org/status/233', proxies=proxies)
+        return r.status_code == 233
+    except RequestException:  # bad proxy
+        return False
+
+
 def check_anonymity(proxies: dict) -> bool:
     if 'transparent' in config.proxy_anonymity:  # accept transparent
         return True
@@ -41,10 +59,6 @@ def check_anonymity(proxies: dict) -> bool:
             return 'Via' not in headers and 'X-Forwarded-For' not in headers  # todo valid?
     except RequestException:  # bad proxy
         return False
-
-
-def check_ssl(proxies: dict) -> bool:
-    pass
 
 
 def check_country(proxies: dict) -> bool:
@@ -62,13 +76,9 @@ def check_country(proxies: dict) -> bool:
     return True
 
 
-def access_twitter(proxies: dict) -> bool:
-    pass
-
-
 def access_weixin(proxies: dict) -> bool:
     try:
-        r = requests.get('http://mp.weixin.qq.com', proxies=proxies, verify=False)
+        r = requests.get('http://mp.weixin.qq.com', proxies=proxies)
         if r.status_code != 200:  # api offline
             return False
         return 'Chrome' in r.text
@@ -87,16 +97,16 @@ def check_proxy() -> Optional[Proxy]:
     elif 'socks' in random_proxy.type:
         proxies['http'] = random_proxy.type + 'h://' + random_proxy.address
     proxies['https'] = proxies['http']
-    if not check_anonymity(proxies):
+    if not check_access(proxies):
         random_proxy.delete()
         return None
     if not check_ssl(proxies):
         random_proxy.delete()
         return None
-    if not check_country(proxies):
+    if not check_anonymity(proxies):
         random_proxy.delete()
         return None
-    if not access_twitter(proxies):
+    if not check_country(proxies):
         random_proxy.delete()
         return None
     if not access_weixin(proxies):
@@ -119,5 +129,4 @@ def rotate_proxy():
     addr = str(cp.address).split(':', 1)
     port = int(addr[1])
     set_checked_proxy(type=proxy_type, host=addr[0], port=port)
-
     Timer(config.rotate_interval, rotate_proxy).start()
