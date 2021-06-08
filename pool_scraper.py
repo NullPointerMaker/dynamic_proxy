@@ -15,6 +15,8 @@ def clarketm():  # github.com/clarketm/proxy-list
     # include:
     # pubproxy.com
     # spys.one
+    if 'http' not in config.proxy_type and 'https' not in config.proxy_type:
+        return
     if not is_updated_github('clarketm/proxy-list', 'proxy-list.txt'):
         return
     r = requests.get('https://github.com/clarketm/proxy-list/raw/master/proxy-list.txt')
@@ -66,12 +68,16 @@ def fate0():  # github.com/fate0/proxylist
 
 
 def free_proxy_list_net():  # free-proxy-list.net
-    scrape_free_proxy_list_net('https://free-proxy-list.net/anonymous-proxy.html')
-    scrape_free_proxy_list_net('https://free-proxy-list.net/uk-proxy.html')
+    if 'transparent' not in config.proxy_anonymity:
+        scrape_free_proxy_list_net('https://free-proxy-list.net/anonymous-proxy.html')
+    if (not config.proxy_country or 'UK' in config.proxy_country) and 'UK' not in config.proxy_country_exclude:
+        scrape_free_proxy_list_net('https://free-proxy-list.net/uk-proxy.html')
     scrape_free_proxy_list_net('https://free-proxy-list.net')
 
 
 def hookzof():  # github.com/hookzof/socks5_list
+    if 'socks5' not in config.proxy_type:
+        return
     if not is_updated_github('hookzof/socks5_list', 'tg/socks.json'):
         return
     r = requests.get('https://github.com/hookzof/socks5_list/raw/master/tg/socks.json')
@@ -117,7 +123,7 @@ def proxy_list_download():  # proxy-list.download
 
 
 def socks_proxy_net():  # socks-proxy.net
-    if not any('socks' in pt for pt in config.proxy_type):
+    if 'socks4' not in config.proxy_type and 'socks5' not in config.proxy_type:
         return
     page = requests.get('https://socks-proxy.net')
     soup = BeautifulSoup(page.text, 'html.parser')
@@ -136,10 +142,16 @@ def socks_proxy_net():  # socks-proxy.net
 
 
 def sslproxies_org():  # sslproxies.org
+    if 'https' not in config.proxy_type:
+        return
     scrape_free_proxy_list_net('https://sslproxies.org')
 
 
 def us_proxy_org():  # us-proxy.org
+    if config.proxy_country and 'US' not in config.proxy_country:
+        return
+    if 'US' in config.proxy_country_exclude:
+        return
     scrape_free_proxy_list_net('https://us-proxy.org')
 
 
