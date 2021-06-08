@@ -21,7 +21,7 @@ def clarketm():  # github.com/clarketm/proxy-list
     if not is_updated_github('clarketm/proxy-list', 'proxy-list.txt'):
         return
     r = requests.get('https://github.com/clarketm/proxy-list/raw/master/proxy-list.txt')
-    lines = r.text().splitlines()[9:]
+    lines = r.text.splitlines()[9:]
     for line in lines:
         p = line.split(' ')
         proxy = Proxy()
@@ -54,7 +54,7 @@ def fate0():  # github.com/fate0/proxylist
     if not is_updated_github('fate0/proxylist', 'proxy.list'):
         return
     r = requests.get('https://github.com/fate0/proxylist/raw/master/proxy.list')
-    lines = r.text().splitlines()
+    lines = r.text.splitlines()
     for line in lines:
         if not line:
             continue
