@@ -29,21 +29,44 @@ local_ip = get_local_ip()
 
 
 def check_anonymity(proxies: dict) -> bool:
-    try:
-        r = requests.get('http://httpbin.org/ip', proxies=proxies, verify=False)
-        if r.status_code != 200:  # api offline
-            return False
-        anonymous = local_ip not in r.text
-    except RequestException:  # bad proxy
-        return False
-    if not config.proxy_anonymity:  # accept no anonymity
-        return True
     if 'transparent' in config.proxy_anonymity:  # accept transparent
         return True
-    return anonymous
+    try:
+        r = requests.get('http://httpbin.org/ip', proxies=proxies)
+        if 'anonymous' in config.proxy_anonymity:  # accept anonymous
+            return local_ip not in r.text
+        r = requests.get('http://httpbin.org/headers', proxies=proxies)
+        if 'elite' in config.proxy_anonymity:  # accept elite
+            headers = r.json()['headers']
+            return 'Via' not in headers and 'X-Forwarded-For' not in headers  # todo valid?
+    except RequestException:  # bad proxy
+        return False
 
 
-def check_weixin(proxies: dict) -> bool:
+def check_ssl(proxies: dict) -> bool:
+    pass
+
+
+def check_country(proxies: dict) -> bool:
+    if not config.proxy_country and not config.proxy_country_exclude:  # accept all countries
+        return True
+    try:
+        r = requests.get('https://echo.copythat.workers.dev', proxies=proxies)
+        country = r.json()['cf']['country']
+    except RequestException:  # bad proxy
+        return False
+    if config.proxy_country and country not in config.proxy_country:
+        return False
+    if config.proxy_country_exclude and country in config.proxy_country_exclude:
+        return False
+    return True
+
+
+def access_twitter(proxies: dict) -> bool:
+    pass
+
+
+def access_weixin(proxies: dict) -> bool:
     try:
         r = requests.get('http://mp.weixin.qq.com', proxies=proxies, verify=False)
         if r.status_code != 200:  # api offline
@@ -67,7 +90,16 @@ def check_proxy() -> Optional[Proxy]:
     if not check_anonymity(proxies):
         random_proxy.delete()
         return None
-    if not check_weixin(proxies):
+    if not check_ssl(proxies):
+        random_proxy.delete()
+        return None
+    if not check_country(proxies):
+        random_proxy.delete()
+        return None
+    if not access_twitter(proxies):
+        random_proxy.delete()
+        return None
+    if not access_weixin(proxies):
         random_proxy.delete()
         return None
     return random_proxy
@@ -77,7 +109,6 @@ def rotate_proxy():
     cp = None
     while not cp:
         cp = check_proxy()
-
     proxy_type = 0
     if 'http' in cp.type:
         proxy_type = socks.PROXY_TYPE_HTTP
