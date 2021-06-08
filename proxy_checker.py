@@ -21,7 +21,7 @@ def set_checked_proxy(**kwargs):
 
 
 def get_local_ip() -> str:
-    r = requests.get('http://httpbin.org/ip')
+    r = requests.get('https://httpbin.org/ip')
     return r.json()['origin']
 
 
