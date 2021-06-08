@@ -41,7 +41,7 @@ def clarketm():  # github.com/clarketm/proxy-list
             raise ValueError('Unknown anonymity: ' + p[1])
         if len(p) < 3:  # no type
             proxy.type = 'http'
-        elif 'S' in p[2]:
+        elif 'S' in p[2]:  # https
             proxy.type = 'https'
         else:
             raise ValueError('Unknown proxy type: ' + p[2])
@@ -130,7 +130,8 @@ def socks_proxy_net():  # socks-proxy.net
     page = requests.get('https://socks-proxy.net')
     soup = BeautifulSoup(page.text, 'html.parser')
     table = soup.find('table', attrs={'address': 'proxylisttable'})
-    for row in table.find_all("tr"):
+    rows = table.find_all("tr")
+    for row in rows:
         cells = row.find_all("td")
         if len(cells) == 8:
             address = cells[0].text
