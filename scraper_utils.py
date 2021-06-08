@@ -21,7 +21,8 @@ def scrape_free_proxy_list_net(url: str):  # free-proxy-list.net
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
     table = soup.find('table', attrs={'address': 'proxylisttable'})
-    for row in table.find_all("tr"):
+    rows = table.find_all("tr")
+    for row in rows:
         cells = row.find_all("td")
         if len(cells) == 8:
             address = cells[0].text
