@@ -26,7 +26,7 @@ def clarketm():  # github.com/clarketm/proxy-list
         proxy = Proxy()
         proxy.address = p[0].strip()
         p = p[1].split('-')
-        if not p[0]:
+        if len(p) < 1:  # no country
             continue
         proxy.country = p[0].strip()
         if len(p) < 2:  # no anonymity
@@ -37,12 +37,14 @@ def clarketm():  # github.com/clarketm/proxy-list
             proxy.anonymity = 'anonymous'
         elif 'H' in p[1]:
             proxy.anonymity = 'elite'
-        if len(p) < 3:
+        else:
+            raise ValueError('Unknown anonymity: ' + p[1])
+        if len(p) < 3:  # no type
             proxy.type = 'http'
         elif 'S' in p[2]:
             proxy.type = 'https'
         else:
-            proxy.type = p[2].strip()
+            raise ValueError('Unknown proxy type: ' + p[2])
         filter_proxy(proxy)
 
 
