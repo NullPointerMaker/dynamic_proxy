@@ -27,7 +27,7 @@ def is_valid(proxy: Proxy) -> bool:
         return False
     if config.proxy_country and proxy.country not in config.proxy_country:
         return False
-    if proxy.country in config.proxy_country_exclude:
+    if config.proxy_country_exclude and proxy.country in config.proxy_country_exclude:
         return False
     return True
 
