@@ -21,7 +21,7 @@ Proxy.create_table()
 def is_valid(proxy: Proxy) -> bool:
     if 'socks' in proxy.type and not proxy.anonymity:
         proxy.anonymity = 'elite'
-    if config.proxy_type and proxy.type not in config.proxy_type:
+    if proxy.type not in config.proxy_type:
         return False
     if proxy.anonymity not in config.proxy_anonymity:
         return False
