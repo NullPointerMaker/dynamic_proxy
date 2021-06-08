@@ -7,9 +7,9 @@ db = SqliteDatabase(config.database_file)
 
 class Proxy(Model):
     address = CharField(unique=True, primary_key=True)
-    type = CharField(max_length=10)
-    anonymity = CharField(max_length=10)
-    country = FixedCharField(max_length=2)
+    type = CharField(max_length=6)
+    anonymity = CharField(max_length=11)
+    country = FixedCharField(max_length=2, null=True)
 
     class Meta:
         database = db
