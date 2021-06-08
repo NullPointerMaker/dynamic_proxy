@@ -104,7 +104,7 @@ def proxy_list_download():  # proxy-list.download
     else:
         tuples = Product(config.proxy_type, config.proxy_anonymity)
     for t in tuples:
-        paras = {'type': t[0], 'anon': t[1], 'country': t[2]}
+        paras = {'type': t[0], 'anon': t[1]}
         if len(t) > 2:
             paras['country'] = t[2]
         r = requests.get('https://www.proxy-list.download/api/v1/get', params=paras)
