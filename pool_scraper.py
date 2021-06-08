@@ -54,7 +54,7 @@ def fate0():  # github.com/fate0/proxylist
     if not is_updated_github('fate0/proxylist', 'proxy.list'):
         return
     r = requests.get('https://github.com/fate0/proxylist/raw/master/proxy.list')
-    lines = r.text.splitlines()
+    lines = r.text().splitlines()
     for line in lines:
         if not line:
             continue
