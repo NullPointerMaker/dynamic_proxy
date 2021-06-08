@@ -18,8 +18,8 @@ def clarketm():  # github.com/clarketm/proxy-list
     if not is_updated_github('clarketm/proxy-list', 'proxy-list.txt'):
         return
     r = requests.get('https://github.com/clarketm/proxy-list/raw/master/proxy-list.txt')
-    lines = r.text.splitlines()
-    for line in lines[9:]:
+    lines = r.text().splitlines()[9:]
+    for line in lines:
         p = line.split(' ')
         proxy = Proxy()
         proxy.address = p[0].strip()
@@ -27,7 +27,7 @@ def clarketm():  # github.com/clarketm/proxy-list
         if not p[0]:
             continue
         proxy.country = p[0].strip()
-        if config.proxy_anonymity and len(p) < 2:
+        if len(p) < 2:  # no anonymity
             continue
         if 'N' in p[1]:
             proxy.anonymity = 'transparent'

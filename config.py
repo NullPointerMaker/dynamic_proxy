@@ -3,7 +3,7 @@
 # http not include https
 proxy_type = ('https', 'socks4', 'socks5')
 # valid option: transparent, anonymous, elite
-# anonymity not set = all
+# anonymity can not set
 proxy_anonymity = ('anonymous', 'elite')
 # country not set = all
 proxy_country = ()

@@ -23,7 +23,7 @@ def is_valid(proxy: Proxy) -> bool:
         proxy.anonymity = 'elite'
     if config.proxy_type and proxy.type not in config.proxy_type:
         return False
-    if config.proxy_anonymity and proxy.anonymity not in config.proxy_anonymity:
+    if proxy.anonymity not in config.proxy_anonymity:
         return False
     if config.proxy_country and proxy.country not in config.proxy_country:
         return False
