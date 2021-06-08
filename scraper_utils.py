@@ -1,5 +1,4 @@
 from datetime import datetime as Datetime
-from itertools import product as Product
 
 import requests
 from bs4 import BeautifulSoup
@@ -33,14 +32,6 @@ def scrape_free_proxy_list_net(url: str):  # free-proxy-list.net
             proxy.anonymity = cells[4].text.replace('&nbsp;', '').replace(' proxy', '')
             proxy.country = cells[2].text.replace('&nbsp;', '').upper()
             filter_proxy(proxy)
-
-
-def product_with_empty(*iterables):
-    lists = list(iterables)
-    for i, l in enumerate(lists):
-        if not l:
-            lists[i] = [()]
-    return Product(*lists)
 
 
 def is_updated(timestamp: Datetime) -> bool:

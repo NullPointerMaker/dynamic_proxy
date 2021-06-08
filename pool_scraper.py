@@ -1,5 +1,6 @@
 import json
 from datetime import datetime as Datetime
+from itertools import product as Product
 from threading import Thread
 
 import requests
@@ -7,7 +8,7 @@ from bs4 import BeautifulSoup
 
 import config
 from proxy_filter import filter_proxy, Proxy
-from scraper_utils import scrape_free_proxy_list_net, product_with_empty, is_updated_github, is_updated
+from scraper_utils import scrape_free_proxy_list_net, is_updated_github, is_updated
 
 
 def clarketm():  # github.com/clarketm/proxy-list
@@ -98,29 +99,25 @@ def hookzof():  # github.com/hookzof/socks5_list
 
 
 def proxy_list_download():  # proxy-list.download
-    proxy_type = list(config.proxy_type)
-    tuples = product_with_empty(proxy_type, config.proxy_anonymity, config.proxy_country)
-    payloads = []
+    if config.proxy_country:
+        tuples = Product(config.proxy_type, config.proxy_anonymity, config.proxy_country)
+    else:
+        tuples = Product(config.proxy_type, config.proxy_anonymity)
     for t in tuples:
-        payload = {}
-        if t[0]:
-            payload['type'] = t[0]
-        if t[1]:
-            payload['anon'] = t[1]
-        if t[2]:
-            payload['country'] = t[2]
-        payloads.append(payload)
-    for p in payloads:
-        r = requests.get('https://www.proxy-list.download/api/v1/get', params=p)
-        txt = r.text
-        for line in txt.split('\n'):
+        paras = {'type': t[0], 'anon': t[1], 'country': t[2]}
+        if len(t) > 2:
+            paras['country'] = t[2]
+        r = requests.get('https://www.proxy-list.download/api/v1/get', params=paras)
+        lines = r.text.splitlines()
+        for line in lines:
             address = line.strip()
             if address:
                 proxy = Proxy()
                 proxy.address = address
-                proxy.type = p['type']
-                proxy.anonymity = p['anon']
-                proxy.country = p['country']
+                proxy.type = paras['type']
+                proxy.anonymity = paras['anon']
+                if 'country' in paras:
+                    proxy.country = paras['country']
                 filter_proxy(proxy)
 
 
