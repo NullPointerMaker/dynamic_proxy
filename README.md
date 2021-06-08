@@ -32,7 +32,8 @@
 * [fate0/proxylist](https://github.com/fate0/proxylist) (AKA proxylist.fatezero.org)
 * free-proxy-list.net (include several subsites)
 * [hookzof/socks5_list](https://github.com/hookzof/socks5_list)
-* proxylist.download
+* proxy-list.download
+* proxyscrape.com
 * socks-proxy.net (subsite of free-proxy-list.net)
 * sslproxies.org (subsite of free-proxy-list.net)
 * us-proxy.org (subsite of free-proxy-list.net)

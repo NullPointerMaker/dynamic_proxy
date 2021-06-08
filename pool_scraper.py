@@ -121,6 +121,35 @@ def proxy_list_download():  # proxy-list.download
                 filter_proxy(proxy)
 
 
+def proxyscrape_com():  # proxyscrape.com
+    if config.proxy_country:
+        tuples = Product(config.proxy_type, config.proxy_anonymity, config.proxy_country)
+    else:
+        tuples = Product(config.proxy_type, config.proxy_anonymity)
+    for t in tuples:
+        paras = {'request': 'getproxies', 'status': '1', 'proxytype': t[0], 'anonymity': t[1]}
+        if 'http' == paras['proxytype']:
+            paras['proxytype'] = 'http'
+            paras['ssl'] = 'no'
+        elif 'https' == paras['proxytype']:
+            paras['proxytype'] = 'http'
+            paras['ssl'] = 'yes'
+        if len(t) > 2:
+            paras['country'] = t[2]
+        r = requests.get('https://api.proxyscrape.com', params=paras)
+        lines = r.text.splitlines()
+        for line in lines:
+            address = line.strip()
+            if address:
+                proxy = Proxy()
+                proxy.address = address
+                proxy.type = t[0]
+                proxy.anonymity = paras['anonymity']
+                if 'country' in paras:
+                    proxy.country = paras['country']
+                filter_proxy(proxy)
+
+
 def socks_proxy_net():  # socks-proxy.net
     if 'socks4' not in config.proxy_type and 'socks5' not in config.proxy_type:
         return
@@ -160,6 +189,7 @@ Thread(fate0()).start()
 Thread(free_proxy_list_net()).start()
 Thread(hookzof()).start()
 Thread(proxy_list_download()).start()
+Thread(proxyscrape_com()).start()
 Thread(socks_proxy_net()).start()
 Thread(sslproxies_org()).start()
 Thread(us_proxy_org()).start()
