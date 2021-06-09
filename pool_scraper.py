@@ -134,7 +134,8 @@ def proxy_list_download():  # proxy-list.download
                 proxy = Proxy()
                 proxy.address = address
                 proxy.type = params['type']
-                proxy.anonymity = params['anon']
+                if 'anon' in params:
+                    proxy.anonymity = params['anon']
                 if 'country' in params:
                     proxy.country = params['country']
                 filter_proxy(proxy)
@@ -165,7 +166,8 @@ def proxyscrape_com():  # proxyscrape.com
                 proxy = Proxy()
                 proxy.address = address
                 proxy.type = setting[0]
-                proxy.anonymity = params['anonymity']
+                if 'anonumity' in params:
+                    proxy.anonymity = params['anonymity']
                 if 'country' in params and ',' not in params.get('country'):
                     proxy.country = params['country']
                 filter_proxy(proxy)
