@@ -1,12 +1,12 @@
 import json
 import logging
 from datetime import datetime as Datetime
-from itertools import product as Product
 from threading import Thread
 
 import requests
 from bs4 import BeautifulSoup
 
+from scraper_utils import scrape_free_proxy_list_net, is_updated_github, is_updated, get_2_settings, get_3_settings
 import config
 from proxy_filter import filter_proxy, Proxy
 
@@ -116,18 +116,16 @@ def hookzof():  # github.com/hookzof/socks5_list
 
 
 def proxy_list_download():  # proxy-list.download
-    url = 'https://www.proxy-list.download/api/v1/get'
-    logging.info('Scraping %s' % url)
-    if config.proxy_country:
-        tuples = Product(config.proxy_type, config.proxy_anonymity, config.proxy_country)
-    else:
-        tuples = Product(config.proxy_type, config.proxy_anonymity)
-    for t in tuples:
-        params = {'type': t[0], 'anon': t[1]}
-        if len(t) > 2:
-            params['country'] = t[2]
-        logging.info('Params %s' % str(params))
-        r = requests.get(url, params=params)
+    logging.info('%s: staring' % proxy_list_download.__name__)
+    settings = get_3_settings()
+    for setting in settings:
+        params = {'type': setting[0]}
+        if setting[1]:
+            params['anon'] = setting[1]
+        if setting[2]:
+            params['country'] = setting[2]
+        logging.info('%s: %s' % (proxy_list_download.__name__, str(params)))
+        r = requests.get('https://www.proxy-list.download/api/v1/get', params=params)
         lines = r.text.splitlines()
         logging.info('%s: %d proxies' % (proxy_list_download.__name__, len(lines)))
         for line in lines:
@@ -144,23 +142,21 @@ def proxy_list_download():  # proxy-list.download
 
 
 def proxyscrape_com():  # proxyscrape.com
-    url = 'https://api.proxyscrape.com'
-    logging.info('Scraping %s' % url)
-    if config.proxy_country:
-        tuples = Product(config.proxy_type, config.proxy_anonymity, config.proxy_country)
-    else:
-        tuples = Product(config.proxy_type, config.proxy_anonymity)
-    for t in tuples:
-        params = {'request': 'getproxies', 'status': '1', 'proxytype': t[0], 'anonymity': t[1]}
+    logging.info('%s: starting' % proxyscrape_com.__name__)
+    settings = get_2_settings()
+    for setting in settings:
+        params = {'request': 'getproxies', 'proxytype': setting[0]}
         if 'http' == params['proxytype']:
             params['ssl'] = 'no'
         elif 'https' == params['proxytype']:
             params['proxytype'] = 'http'
             params['ssl'] = 'yes'
-        if len(t) > 2:
-            params['country'] = t[2]
-        logging.info('Params %s' % str(params))
-        r = requests.get(url, params=params)
+        if setting[1]:
+            params['anonymity'] = setting[1]
+        if config.proxy_country:
+            params['country'] = ','.join(config.proxy_country)
+        logging.info('%s: %s' % (proxyscrape_com.__name__, str(params)))
+        r = requests.get('https://api.proxyscrape.com', params=params)
         lines = r.text.splitlines()
         logging.info('%s: %d proxies' % (proxyscrape_com.__name__, len(lines)))
         for line in lines:

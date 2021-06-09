@@ -47,3 +47,25 @@ def is_updated_github(repo: str, path: str) -> bool:
     repo: Repository = Github().get_repo(repo)
     commits: PaginatedList[Commit] = repo.get_commits(path=path)
     return is_updated(commits[0].commit.author.date)
+
+
+def get_2_settings() -> set:
+    settings = set()
+    for proxy_type in config.proxy_type:
+        if 'socks' in proxy_type:
+            settings.add((proxy_type, ''))
+        else:
+            for anonymity in config.proxy_anonymity:
+                settings.add((proxy_type, anonymity))
+    return settings
+
+
+def get_3_settings() -> set:
+    settings_2 = get_2_settings()
+    settings = set()
+    for paras in settings_2:
+        if not config.proxy_country:
+            settings.add((paras[0], paras[1], ''))
+        for country in config.proxy_country:
+            settings.add((paras[0], paras[1], country))
+    return settings
