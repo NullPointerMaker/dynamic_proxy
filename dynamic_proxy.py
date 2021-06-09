@@ -70,7 +70,10 @@ async def conn_client(reader: StreamReader, writer: StreamWriter):
     from_client, to_client = reader, writer
     try:
         http_headers: list[bytes] = []
-        while (line := await from_client.readline()) != b'\r\n':
+        while True:
+            line = await from_client.readline()
+            if line == b'\r\n':
+                break
             http_headers.append(line)
         is_connect, server_host, server_port = get_conn_prop(http_headers)
     except (IOError, ValueError) as e:
