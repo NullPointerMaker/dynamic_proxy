@@ -20,9 +20,9 @@ def scrape_free_proxy_list_net(url: str):  # free-proxy-list.net
     if 'https' not in config.proxy_type and 'http' not in config.proxy_type:
         logging.info('No HTTP(S) configured')
         return
-    page = requests.get(url)
-    soup = BeautifulSoup(page.text, 'html.parser')
-    table = soup.find('table', attrs={'address': 'proxylisttable'})
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    table = soup.find('table', attrs={'id': 'proxylisttable'})
     rows = table.find_all("tr")
     logging.info('%d proxies' % len(rows)-1)
     for row in rows:

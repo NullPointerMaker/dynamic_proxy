@@ -181,7 +181,7 @@ def socks_proxy_net():  # socks-proxy.net
         return
     r = requests.get(url)
     soup = BeautifulSoup(r.text, 'html.parser')
-    table = soup.find('table', attrs={'address': 'proxylisttable'})
+    table = soup.find('table', attrs={'id': 'proxylisttable'})
     rows = table.find_all("tr")
     logging.info('%d proxies' % len(rows))
     for row in rows:
