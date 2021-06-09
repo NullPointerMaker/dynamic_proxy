@@ -16,15 +16,14 @@ def scrape_free_proxy_list_net(url: str):  # free-proxy-list.net
     # include:
     # sslproxies.org
     # us-proxy.org
-    logging.info('Scraping %s' % url)
+    logging.info('%s starting' % url)
     if 'https' not in config.proxy_type and 'http' not in config.proxy_type:
-        logging.info('No HTTP(S) configured')
         return
     r = requests.get(url)
     soup = BeautifulSoup(r.text, 'html.parser')
     table = soup.find('table', attrs={'id': 'proxylisttable'})
     rows = table.find_all("tr")
-    logging.info('%d proxies' % len(rows)-1)
+    logging.info('%s %d proxies' % (url, len(rows) - 1))
     for row in rows:
         cells = row.find_all("td")
         if len(cells) == 8:
@@ -36,6 +35,7 @@ def scrape_free_proxy_list_net(url: str):  # free-proxy-list.net
             proxy.anonymity = cells[4].text.lower().strip('&nbsp;').strip(' proxy')
             proxy.country = cells[2].text.upper().strip('&nbsp;')
             filter_proxy(proxy)
+    logging.info('%s ending' % url)
 
 
 def is_updated(timestamp: Datetime) -> bool:
