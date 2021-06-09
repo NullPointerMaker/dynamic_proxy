@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime as Datetime
 from itertools import product as Product
 from threading import Thread
@@ -16,12 +17,17 @@ def clarketm():  # github.com/clarketm/proxy-list
     # include:
     # pubproxy.com
     # spys.one
+    url = 'https://github.com/clarketm/proxy-list/raw/master/proxy-list.txt'
+    logging.info('Scraping %s' % url)
     if 'http' not in config.proxy_type and 'https' not in config.proxy_type:
+        logging.info('No HTTP(S) configured')
         return
     if not is_updated_github('clarketm/proxy-list', 'proxy-list.txt'):
+        logging.info('No update')
         return
-    r = requests.get('https://github.com/clarketm/proxy-list/raw/master/proxy-list.txt')
+    r = requests.get(url)
     lines = r.text.splitlines()[9:]
+    logging.info('%d proxies' % len(lines))
     for line in lines:
         p = line.split(' ')
         proxy = Proxy()
@@ -51,10 +57,14 @@ def clarketm():  # github.com/clarketm/proxy-list
 
 def fate0():  # github.com/fate0/proxylist
     # as known as proxylist.fatezero.org
+    url = 'https://github.com/fate0/proxylist/raw/master/proxy.list'
+    logging.info('Scrapping %s' % url)
     if not is_updated_github('fate0/proxylist', 'proxy.list'):
+        logging.info('No update')
         return
-    r = requests.get('https://github.com/fate0/proxylist/raw/master/proxy.list')
+    r = requests.get(url)
     lines = r.text.splitlines()
+    logging.info('%d proxies' % len(lines))
     for line in lines:
         if not line:
             continue
@@ -79,12 +89,17 @@ def free_proxy_list_net():  # free-proxy-list.net
 
 
 def hookzof():  # github.com/hookzof/socks5_list
+    url = 'https://github.com/hookzof/socks5_list/raw/master/tg/socks.json'
+    logging.info('Scraping %s' % url)
     if 'socks5' not in config.proxy_type:
+        logging.info('No SOCKS5 configured')
         return
     if not is_updated_github('hookzof/socks5_list', 'tg/socks.json'):
+        logging.info('No update')
         return
-    r = requests.get('https://github.com/hookzof/socks5_list/raw/master/tg/socks.json')
+    r = requests.get(url)
     jsons = r.json()
+    logging.info('%d proxies' % len(jsons))
     for j in jsons:
         timestamp = int(j['unix'])
         dt = Datetime.fromtimestamp(timestamp)
@@ -99,64 +114,76 @@ def hookzof():  # github.com/hookzof/socks5_list
 
 
 def proxy_list_download():  # proxy-list.download
+    url = 'https://www.proxy-list.download/api/v1/get'
+    logging.info('Scraping %s' % url)
     if config.proxy_country:
         tuples = Product(config.proxy_type, config.proxy_anonymity, config.proxy_country)
     else:
         tuples = Product(config.proxy_type, config.proxy_anonymity)
     for t in tuples:
-        paras = {'type': t[0], 'anon': t[1]}
+        params = {'type': t[0], 'anon': t[1]}
         if len(t) > 2:
-            paras['country'] = t[2]
-        r = requests.get('https://www.proxy-list.download/api/v1/get', params=paras)
+            params['country'] = t[2]
+        logging.info('Params %s' % str(params))
+        r = requests.get(url, params=params)
         lines = r.text.splitlines()
+        logging.info('%d proxies' % len(lines))
         for line in lines:
             address = line.strip()
             if address:
                 proxy = Proxy()
                 proxy.address = address
-                proxy.type = paras['type']
-                proxy.anonymity = paras['anon']
-                if 'country' in paras:
-                    proxy.country = paras['country']
+                proxy.type = params['type']
+                proxy.anonymity = params['anon']
+                if 'country' in params:
+                    proxy.country = params['country']
                 filter_proxy(proxy)
 
 
 def proxyscrape_com():  # proxyscrape.com
+    url = 'https://api.proxyscrape.com'
+    logging.info('Scraping %s' % url)
     if config.proxy_country:
         tuples = Product(config.proxy_type, config.proxy_anonymity, config.proxy_country)
     else:
         tuples = Product(config.proxy_type, config.proxy_anonymity)
     for t in tuples:
-        paras = {'request': 'getproxies', 'status': '1', 'proxytype': t[0], 'anonymity': t[1]}
-        if 'http' == paras['proxytype']:
-            paras['proxytype'] = 'http'
-            paras['ssl'] = 'no'
-        elif 'https' == paras['proxytype']:
-            paras['proxytype'] = 'http'
-            paras['ssl'] = 'yes'
+        params = {'request': 'getproxies', 'status': '1', 'proxytype': t[0], 'anonymity': t[1]}
+        if 'http' == params['proxytype']:
+            params['proxytype'] = 'http'
+            params['ssl'] = 'no'
+        elif 'https' == params['proxytype']:
+            params['proxytype'] = 'http'
+            params['ssl'] = 'yes'
         if len(t) > 2:
-            paras['country'] = t[2]
-        r = requests.get('https://api.proxyscrape.com', params=paras)
+            params['country'] = t[2]
+        logging.info('Params %s' % str(params))
+        r = requests.get(url, params=params)
         lines = r.text.splitlines()
+        logging.info('%d proxies' % len(lines))
         for line in lines:
             address = line.strip()
             if address:
                 proxy = Proxy()
                 proxy.address = address
                 proxy.type = t[0]
-                proxy.anonymity = paras['anonymity']
-                if 'country' in paras:
-                    proxy.country = paras['country']
+                proxy.anonymity = params['anonymity']
+                if 'country' in params:
+                    proxy.country = params['country']
                 filter_proxy(proxy)
 
 
 def socks_proxy_net():  # socks-proxy.net
+    url = 'https://socks-proxy.net'
+    logging.info('Scraping %s' % url)
     if 'socks4' not in config.proxy_type and 'socks5' not in config.proxy_type:
+        logging.info('No SOCKS configured')
         return
-    page = requests.get('https://socks-proxy.net')
-    soup = BeautifulSoup(page.text, 'html.parser')
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html.parser')
     table = soup.find('table', attrs={'address': 'proxylisttable'})
     rows = table.find_all("tr")
+    logging.info('%d proxies' % len(rows))
     for row in rows:
         cells = row.find_all("td")
         if len(cells) == 8:

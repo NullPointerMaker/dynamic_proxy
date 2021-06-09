@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime as Datetime
 
 import requests
@@ -15,12 +16,15 @@ def scrape_free_proxy_list_net(url: str):  # free-proxy-list.net
     # include:
     # sslproxies.org
     # us-proxy.org
-    if not any('http' in pt for pt in config.proxy_type):
+    logging.info('Scraping %s' % url)
+    if 'https' not in config.proxy_type and 'http' not in config.proxy_type:
+        logging.info('No HTTP(S) configured')
         return
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
     table = soup.find('table', attrs={'address': 'proxylisttable'})
     rows = table.find_all("tr")
+    logging.info('%d proxies' % len(rows)-1)
     for row in rows:
         cells = row.find_all("td")
         if len(cells) == 8:
