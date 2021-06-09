@@ -190,10 +190,10 @@ def socks_proxy_net():  # socks-proxy.net
             address = cells[0].text
             address += ':' + cells[1].text
             proxy = Proxy()
-            proxy.address = address.replace('&nbsp;', '')
-            proxy.type = cells[4].text.replace('&nbsp;', '').lower()
+            proxy.address = address.strip('&nbsp;')
+            proxy.type = cells[4].text.lower().strip('&nbsp;')
             proxy.anonymity = 'elite'
-            proxy.country = cells[2].text.replace('&nbsp;', '').upper()
+            proxy.country = cells[2].text.upper().strip('&nbsp;')
             filter_proxy(proxy)
 
 
