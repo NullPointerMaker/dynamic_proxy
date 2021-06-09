@@ -2,7 +2,7 @@ from peewee import SqliteDatabase, Model, CharField, FixedCharField, IntegrityEr
 
 import config
 
-db = SqliteDatabase(config.database_file)
+db = SqliteDatabase('pool.db')
 
 
 class Proxy(Model):

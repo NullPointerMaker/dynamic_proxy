@@ -9,8 +9,6 @@ proxy_anonymity = ('anonymous', 'elite')
 proxy_country = ()
 proxy_country_exclude = ('CN', 'MO')
 
-database_file = 'pool.db'
-
 local_host = '127.0.0.1'
 local_port = 1080
 
