@@ -1,8 +1,30 @@
+import logging
+from multiprocessing import Lock as ProcessLock
+from threading import Lock as ThreadLock
+
 from peewee import SqliteDatabase, Model, CharField, FixedCharField, IntegrityError
 
 import config
 
 db = SqliteDatabase('pool.db')
+threadLock = ThreadLock()
+processLock = ProcessLock()
+
+
+def lock():
+    logging.debug('locking')
+    threadLock.acquire()
+    logging.debug('locked thread')
+    processLock.acquire()
+    logging.debug('locked process')
+
+
+def unlock():
+    logging.debug('unlocking')
+    processLock.release()
+    logging.debug('unlocked process')
+    threadLock.release()
+    logging.debug('unlocked process')
 
 
 class Proxy(Model):
@@ -16,6 +38,14 @@ class Proxy(Model):
 
 
 Proxy.create_table()
+
+
+def delete_proxy(proxy: Proxy):
+    lock()
+    try:
+        proxy.delete()
+    finally:
+        unlock()
 
 
 def is_valid(proxy: Proxy) -> bool:
@@ -34,7 +64,11 @@ def is_valid(proxy: Proxy) -> bool:
 
 def filter_proxy(proxy: Proxy):
     if is_valid(proxy):
+        lock()
         try:
             proxy.save(force_insert=True)
         except IntegrityError:
             pass
+        finally:
+            unlock()
+

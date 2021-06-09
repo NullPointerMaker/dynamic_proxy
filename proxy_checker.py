@@ -7,9 +7,9 @@ from peewee import fn
 from requests import RequestException
 
 import config
-from proxy_filter import Proxy, is_valid
+from proxy_filter import Proxy, is_valid, delete_proxy
 
-global checked_proxy
+checked_proxy = dict()
 
 
 def get_checked_proxy() -> dict:
@@ -17,7 +17,8 @@ def get_checked_proxy() -> dict:
 
 
 def set_checked_proxy(**kwargs):
-    checked_proxy.update(kwargs)
+    global checked_proxy
+    checked_proxy = kwargs
 
 
 def get_local_ip() -> str:
@@ -89,7 +90,7 @@ def access_weixin(proxies: dict) -> bool:
 def check_proxy() -> Optional[Proxy]:
     random_proxy: Proxy = Proxy.select().order_by(fn.Random())
     if not is_valid(random_proxy):
-        random_proxy.delete()
+        delete_proxy(random_proxy)
         return None
     proxies = {}
     if 'http' in random_proxy.type:
@@ -98,19 +99,19 @@ def check_proxy() -> Optional[Proxy]:
         proxies['http'] = random_proxy.type + 'h://' + random_proxy.address
     proxies['https'] = proxies['http']
     if not check_access(proxies):
-        random_proxy.delete()
+        delete_proxy(random_proxy)
         return None
     if not check_ssl(proxies):
-        random_proxy.delete()
+        delete_proxy(random_proxy)
         return None
     if not check_anonymity(proxies):
-        random_proxy.delete()
+        delete_proxy(random_proxy)
         return None
     if not check_country(proxies):
-        random_proxy.delete()
+        delete_proxy(random_proxy)
         return None
     if not access_weixin(proxies):
-        random_proxy.delete()
+        delete_proxy(random_proxy)
         return None
     return random_proxy
 
