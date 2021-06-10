@@ -31,9 +31,11 @@ def get_local_ip() -> str:
 
 
 local_ip = get_local_ip()
+logging.info('Local IP: %s' % local_ip)
 
 
 def check_access(proxies: dict) -> bool:
+    logging.info(check_access.__name__)
     try:
         r = requests.head('http://twitter.com', proxies=proxies)
         return r.status_code > 0
@@ -42,6 +44,7 @@ def check_access(proxies: dict) -> bool:
 
 
 def check_ssl(proxies: dict) -> bool:
+    logging.info(check_ssl.__name__)
     if 'http' in config.proxy_type:  # accept plain
         return True
     try:
@@ -52,6 +55,7 @@ def check_ssl(proxies: dict) -> bool:
 
 
 def check_anonymity(proxies: dict) -> bool:
+    logging.info(check_anonymity.__name__)
     if 'transparent' in config.proxy_anonymity:  # accept transparent
         return True
     try:
@@ -70,6 +74,7 @@ def check_anonymity(proxies: dict) -> bool:
 
 
 def check_country(proxies: dict) -> bool:
+    logging.info(check_country.__name__)
     if not config.proxy_country and not config.proxy_country_exclude:  # accept all countries
         return True
     try:
@@ -90,6 +95,7 @@ def check_country(proxies: dict) -> bool:
 
 
 def access_weixin(proxies: dict) -> bool:
+    logging.info(access_weixin.__name__)
     try:
         r = requests.get('http://mp.weixin.qq.com', proxies=proxies, timeout=timeout)
         if r.status_code != 200:  # api offline
