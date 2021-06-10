@@ -87,7 +87,7 @@ def free_proxy_list_net():  # free-proxy-list.net
     if (not config.proxy_country or 'UK' in config.proxy_country) and 'UK' not in config.proxy_country_exclude:
         scrape_free_proxy_list_net('https://free-proxy-list.net/uk-proxy.html')
     scrape_free_proxy_list_net('https://free-proxy-list.net')
-    logging.info('%s: starting' % free_proxy_list_net.__name__)
+    logging.info('%s: ending' % free_proxy_list_net.__name__)
 
 
 def hookzof():  # github.com/hookzof/socks5_list
