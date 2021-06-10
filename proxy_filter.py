@@ -36,7 +36,7 @@ Proxy.create_table()
 def delete_proxy(proxy: Proxy):
     lock()
     try:
-        proxy.delete()
+        proxy.delete_instance()
     finally:
         unlock()
 
