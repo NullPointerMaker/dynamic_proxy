@@ -2,6 +2,7 @@ import asyncio
 import logging
 import socket
 from asyncio import StreamReader, StreamWriter, StreamReaderProtocol
+from typing import List
 
 import socks  # pysocks
 
@@ -55,7 +56,7 @@ async def conn_server(server_host: str, server_port: int) -> (StreamReader, Stre
     return from_server, to_server
 
 
-def get_conn_prop(headers: list[bytes]) -> (bool, str, int):
+def get_conn_prop(headers: List[bytes]) -> (bool, str, int):
     header: str = headers[0].decode()
     method, url, version = header.split(' ', 2)
     is_connect = method.upper() == 'CONNECT'

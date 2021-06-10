@@ -5,7 +5,7 @@
 * Serve as a HTTPS proxy, tunnel to a periodically rotating random remote proxy.
 
 ## Install
-1. Install Python 3.8+.
+1. Install Python 3.6.8+.
 2. Install requirements:
    ```
    pip3 install -r requirements.txt
