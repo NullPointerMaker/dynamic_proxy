@@ -31,7 +31,6 @@ def get_local_ip() -> str:
 
 
 local_ip = get_local_ip()
-logging.info('Local IP: %s' % local_ip)
 
 
 def check_access(proxies: dict) -> bool:
