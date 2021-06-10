@@ -1,5 +1,5 @@
 import logging
-from json import JSONDecodeError
+import re
 from threading import Timer
 from typing import Optional
 
@@ -58,13 +58,16 @@ def check_anonymity(proxies: dict) -> bool:
     if 'transparent' in config.proxy_anonymity:  # accept transparent
         return True
     try:
-        r = session.get('http://httpbin.org/ip', proxies=proxies, timeout=timeout)
+        r = session.get('http://httpbin.org/anything', proxies=proxies, timeout=timeout)
         if 'anonymous' in config.proxy_anonymity:  # accept anonymous
-            return local_ip not in r.text
-        r = session.get('http://httpbin.org/headers', proxies=proxies, timeout=timeout)
+            anonymous = local_ip not in r.text
+            logging.debug('anonymous: ' + str(anonymous))
+            return anonymous
         if 'elite' in config.proxy_anonymity:  # accept elite
             headers = r.json()['headers']
-            return 'Via' not in headers and 'X-Forwarded-For' not in headers  # todo valid?
+            elite = 'Via' not in headers and 'X-Forwarded-For' not in headers  # todo valid?
+            logging.debug('elite: ' + str(elite))
+            return elite
     except RequestException:  # bad proxy
         return False
 
@@ -72,15 +75,15 @@ def check_anonymity(proxies: dict) -> bool:
 def check_country(proxies: dict) -> bool:
     if not config.proxy_country and not config.proxy_country_exclude:  # accept all countries
         return True
-    r = None
     try:
-        r = session.get('https://echo.copythat.workers.dev', proxies=proxies, timeout=timeout)
-        country = r.json()['cf']['country']
-    except RequestException as e:  # bad proxy
-        logging.debug(e)
-        return False
-    except JSONDecodeError:
-        logging.debug(r.text)
+        r = session.get('https://api.cloudflare.com/cdn-cgi/trace', proxies=proxies, timeout=timeout)
+        locs = re.findall(r'^loc=([A-Z]{2})$', r.text, re.MULTILINE)
+        if locs:
+            country = locs[0]
+        else:
+            logging.error(r.text)
+            return False
+    except RequestException:  # bad proxy
         return False
     if config.proxy_country and country not in config.proxy_country:
         return False
@@ -147,7 +150,7 @@ def rotate_proxy():
         proxy_type = socks.PROXY_TYPE_SOCKS4
     elif 'socks5' in cp.type:
         proxy_type = socks.PROXY_TYPE_SOCKS5
-    addr = str(cp.address).split(':', 1)[0]
+    addr = str(cp.address).split(':')
     port = int(addr[1])
-    set_checked_proxy(type=proxy_type, host=addr, port=port)
+    set_checked_proxy(type=proxy_type, host=addr[0], port=port)
     Timer(config.rotate_interval, rotate_proxy).start()
