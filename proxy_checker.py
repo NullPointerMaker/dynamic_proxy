@@ -1,3 +1,4 @@
+import logging
 from threading import Timer
 from typing import Optional
 
@@ -88,8 +89,10 @@ def access_weixin(proxies: dict) -> bool:
 
 
 def check_proxy() -> Optional[Proxy]:
-    random_proxy: Proxy = Proxy.select().order_by(fn.Random())
+    random_proxy: Proxy = Proxy.select().order_by(fn.Random()).get()
+    logging.info('%s: %s' % (check_proxy.__name__, random_proxy.address))
     if not is_valid(random_proxy):
+        logging.warning('%s: %s not valid' % (check_proxy.__name__, random_proxy.address))
         delete_proxy(random_proxy)
         return None
     proxies = {}
@@ -99,20 +102,26 @@ def check_proxy() -> Optional[Proxy]:
         proxies['http'] = random_proxy.type + '://' + random_proxy.address
     proxies['https'] = proxies['http']
     if not check_access(proxies):
+        logging.warning('%s: %s not access' % (check_proxy.__name__, random_proxy.address))
         delete_proxy(random_proxy)
         return None
     if not check_ssl(proxies):
+        logging.warning('%s: %s invalid ssl' % (check_proxy.__name__, random_proxy.address))
         delete_proxy(random_proxy)
         return None
     if not check_anonymity(proxies):
+        logging.warning('%s: %s invalid anonymity' % (check_proxy.__name__, random_proxy.address))
         delete_proxy(random_proxy)
         return None
     if not check_country(proxies):
+        logging.warning('%s: %s invalid country' % (check_proxy.__name__, random_proxy.address))
         delete_proxy(random_proxy)
         return None
     if not access_weixin(proxies):
+        logging.warning('%s: %s not access weixin' % (check_proxy.__name__, random_proxy.address))
         delete_proxy(random_proxy)
         return None
+    logging.info('%s: %s valid' % (check_proxy.__name__, random_proxy.address))
     return random_proxy
 
 
