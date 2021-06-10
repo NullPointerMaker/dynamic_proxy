@@ -4,17 +4,14 @@ from threading import Timer
 from typing import Optional
 
 import peewee
+import requests
 import socks
-from requests import Session, RequestException
-from requests.adapters import HTTPAdapter
+from requests import RequestException
 
 import config
 from proxy_filter import Proxy, is_valid, delete_proxy
 
 timeout = 5
-session = Session()
-session.mount('http://', HTTPAdapter(max_retries=5))
-session.mount('https://', HTTPAdapter(max_retries=5))
 
 checked_proxy = dict()
 
@@ -29,7 +26,7 @@ def set_checked_proxy(**kwargs):
 
 
 def get_local_ip() -> str:
-    r = session.get('https://httpbin.org/ip')
+    r = requests.get('https://httpbin.org/ip')
     return r.json()['origin']
 
 
@@ -38,7 +35,7 @@ local_ip = get_local_ip()
 
 def check_access(proxies: dict) -> bool:
     try:
-        r = session.head('http://twitter.com', proxies=proxies)
+        r = requests.head('http://twitter.com', proxies=proxies)
         return r.status_code > 0
     except RequestException:  # bad proxy
         return False
@@ -48,7 +45,7 @@ def check_ssl(proxies: dict) -> bool:
     if 'http' in config.proxy_type:  # accept plain
         return True
     try:
-        r = session.head('https://httpbin.org', proxies=proxies)
+        r = requests.head('https://httpbin.org', proxies=proxies)
         return r.status_code > 0
     except RequestException:  # bad proxy
         return False
@@ -58,7 +55,7 @@ def check_anonymity(proxies: dict) -> bool:
     if 'transparent' in config.proxy_anonymity:  # accept transparent
         return True
     try:
-        r = session.get('http://httpbin.org/anything', proxies=proxies, timeout=timeout)
+        r = requests.get('http://httpbin.org/anything', proxies=proxies, timeout=timeout)
         if 'anonymous' in config.proxy_anonymity:  # accept anonymous
             anonymous = local_ip not in r.text
             logging.debug('anonymous: ' + str(anonymous))
@@ -76,7 +73,7 @@ def check_country(proxies: dict) -> bool:
     if not config.proxy_country and not config.proxy_country_exclude:  # accept all countries
         return True
     try:
-        r = session.get('http://api.cloudflare.com/cdn-cgi/trace', proxies=proxies, timeout=timeout)
+        r = requests.get('http://api.cloudflare.com/cdn-cgi/trace', proxies=proxies, timeout=timeout)
         locs = re.findall(r'^loc=([A-Z]{2})$', r.text, re.MULTILINE)
         if locs:
             country = locs[0]
@@ -94,7 +91,7 @@ def check_country(proxies: dict) -> bool:
 
 def access_weixin(proxies: dict) -> bool:
     try:
-        r = session.get('http://mp.weixin.qq.com', proxies=proxies, timeout=timeout)
+        r = requests.get('http://mp.weixin.qq.com', proxies=proxies, timeout=timeout)
         if r.status_code != 200:  # api offline
             return False
         return 'Chrome' in r.text
