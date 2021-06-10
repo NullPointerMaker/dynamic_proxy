@@ -105,8 +105,9 @@ async def conn_client(reader: StreamReader, writer: StreamWriter):
 
 
 rotate_proxy()
+event_loop = asyncio.get_event_loop()
 server = asyncio.start_server(conn_client,
                               host=config.local_host,
-                              port=config.local_port,
-                              reuse_address=True,
-                              reuse_port=True)
+                              port=config.local_port)
+server = event_loop.run_until_complete(server)
+event_loop.run_forever()
