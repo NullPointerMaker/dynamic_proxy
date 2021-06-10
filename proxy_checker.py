@@ -96,7 +96,7 @@ def check_proxy() -> Optional[Proxy]:
     if 'http' in random_proxy.type:
         proxies['http'] = 'http://' + random_proxy.address
     elif 'socks' in random_proxy.type:
-        proxies['http'] = random_proxy.type + 'h://' + random_proxy.address
+        proxies['http'] = random_proxy.type + '://' + random_proxy.address
     proxies['https'] = proxies['http']
     if not check_access(proxies):
         delete_proxy(random_proxy)
