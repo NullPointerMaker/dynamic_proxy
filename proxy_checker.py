@@ -76,7 +76,7 @@ def check_country(proxies: dict) -> bool:
     if not config.proxy_country and not config.proxy_country_exclude:  # accept all countries
         return True
     try:
-        r = session.get('https://api.cloudflare.com/cdn-cgi/trace', proxies=proxies, timeout=timeout)
+        r = session.get('http://api.cloudflare.com/cdn-cgi/trace', proxies=proxies, timeout=timeout)
         locs = re.findall(r'^loc=([A-Z]{2})$', r.text, re.MULTILINE)
         if locs:
             country = locs[0]
@@ -94,7 +94,7 @@ def check_country(proxies: dict) -> bool:
 
 def access_weixin(proxies: dict) -> bool:
     try:
-        r = session.get('https://mp.weixin.qq.com', proxies=proxies, timeout=timeout)
+        r = session.get('http://mp.weixin.qq.com', proxies=proxies, timeout=timeout)
         if r.status_code != 200:  # api offline
             return False
         return 'Chrome' in r.text
