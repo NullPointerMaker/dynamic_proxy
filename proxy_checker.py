@@ -11,7 +11,7 @@ from requests.adapters import HTTPAdapter
 import config
 from proxy_filter import Proxy, is_valid, delete_proxy
 
-timeout = 60
+timeout = 5
 session = Session()
 session.mount('http://', HTTPAdapter(max_retries=5))
 session.mount('https://', HTTPAdapter(max_retries=5))
