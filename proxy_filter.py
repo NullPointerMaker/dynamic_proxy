@@ -71,4 +71,3 @@ def filter_proxy(proxy: Proxy):
             pass
         finally:
             unlock()
-

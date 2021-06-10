@@ -6,12 +6,11 @@ from threading import Thread
 import requests
 from bs4 import BeautifulSoup
 
-from scraper_utils import scrape_free_proxy_list_net, is_updated_github, is_updated, get_2_settings, get_3_settings
 import config
 from proxy_filter import filter_proxy, Proxy
+from scraper_utils import scrape_free_proxy_list_net, is_updated_github, is_updated, get_2_settings, get_3_settings
 
-log = logging.getLogger()
-log.setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 
 def clarketm():  # github.com/clarketm/proxy-list
