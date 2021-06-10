@@ -112,4 +112,5 @@ server = asyncio.start_server(conn_client,
                               host=config.local_host,
                               port=config.local_port)
 server = event_loop.run_until_complete(server)
+logging.info('HTTP proxy is serving at %s:%d' % (config.local_host, config.local_port))
 event_loop.run_forever()
