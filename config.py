@@ -13,3 +13,5 @@ local_host = '127.0.0.1'
 local_port = 1081
 
 rotate_interval = 600
+
+timeout = 5
