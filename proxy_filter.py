@@ -1,4 +1,3 @@
-import logging
 from multiprocessing import Lock as ProcessLock
 from threading import Lock as ThreadLock
 
@@ -12,19 +11,13 @@ processLock = ProcessLock()
 
 
 def lock():
-    logging.debug('locking')
     threadLock.acquire()
-    logging.debug('locked thread')
     processLock.acquire()
-    logging.debug('locked process')
 
 
 def unlock():
-    logging.debug('unlocking')
     processLock.release()
-    logging.debug('unlocked process')
     threadLock.release()
-    logging.debug('unlocked process')
 
 
 class Proxy(Model):
