@@ -127,7 +127,7 @@ def rotate_proxy():
         proxy_type = socks.PROXY_TYPE_SOCKS4
     elif 'socks5' in cp.type:
         proxy_type = socks.PROXY_TYPE_SOCKS5
-    addr = str(cp.address).split(':', 1)
+    addr = str(cp.address).split(':', 1)[0]
     port = int(addr[1])
-    set_checked_proxy(type=proxy_type, host=addr[0], port=port)
+    set_checked_proxy(type=proxy_type, host=addr, port=port)
     Timer(config.rotate_interval, rotate_proxy).start()
