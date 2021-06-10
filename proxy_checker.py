@@ -76,7 +76,7 @@ def check_country(proxies: dict) -> bool:
         return True
     try:
         r = requests.get('http://api.cloudflare.com/cdn-cgi/trace', proxies=proxies, timeout=config.timeout)
-        locs = re.findall(r'^loc=([A-Z]{2})$', r.text, re.MULTILINE)
+        locs = re.findall(r'^loc=([A-Z0-9]{2})$', r.text, re.MULTILINE)
         if locs:
             country = locs[0]
         else:
