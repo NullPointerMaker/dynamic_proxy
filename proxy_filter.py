@@ -2,7 +2,7 @@ import logging
 from multiprocessing import Lock as ProcessLock
 from threading import Lock as ThreadLock
 
-from peewee import SqliteDatabase, Model, CharField, FixedCharField, IntegrityError, InterfaceError
+from peewee import SqliteDatabase, Model, CharField, FixedCharField, IntegrityError, InterfaceError, OperationalError
 
 import config
 
@@ -38,6 +38,8 @@ def delete_proxy(proxy: Proxy):
     lock()
     try:
         proxy.delete_instance()
+    except OperationalError as oe:
+        logging.exception(oe)
     finally:
         unlock()
 
@@ -63,8 +65,8 @@ def filter_proxy(proxy: Proxy):
             proxy.save(force_insert=True)
         except IntegrityError:
             pass
-        except InterfaceError as e:  # dont know why
-            logging.exception(e)
+        except InterfaceError as ie:  # dont know why
+            logging.exception(ie)
         finally:
             unlock()
         logging.debug('%s saved' % proxy.address)
