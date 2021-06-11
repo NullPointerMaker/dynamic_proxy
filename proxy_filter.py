@@ -65,7 +65,9 @@ def filter_proxy(proxy: Proxy):
             proxy.save(force_insert=True)
         except IntegrityError:
             pass
-        except InterfaceError as ie:  # dont know why
+        except InterfaceError as ie:
+            # Error binding parameter 0 - probably unsupported type.
+            # dont know why
             logging.exception(ie)
         finally:
             unlock()
