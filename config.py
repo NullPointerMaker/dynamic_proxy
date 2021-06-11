@@ -10,8 +10,7 @@ proxy_country = []
 proxy_country_exclude = ['CN', 'MO']
 
 local_host = '127.0.0.1'
-local_port = 1081
+local_port = 3128
 
 rotate_interval = 600
-
 timeout = 5
