@@ -14,3 +14,4 @@ local_port = 3128
 
 rotate_interval = 600
 timeout = 10
+check_access = ['http://twitter.com']

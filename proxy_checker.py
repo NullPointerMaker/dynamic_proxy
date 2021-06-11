@@ -34,10 +34,13 @@ local_ip = get_local_ip()
 def check_access(proxies: dict) -> bool:
     logging.info(check_access.__name__)
     try:
-        r = requests.head('http://twitter.com', proxies=proxies, timeout=config.timeout)
-        return r.status_code > 0
+        for url in config.check_access:
+            r = requests.head(url, proxies=proxies, timeout=config.timeout)
+            if r.status_code < 200:
+                return False
     except RequestException:  # bad proxy
         return False
+    return True
 
 
 def check_ssl(proxies: dict) -> bool:
@@ -132,7 +135,7 @@ def check_proxy() -> Optional[Proxy]:
         delete_proxy(random_proxy)
         return None
     if not access_weixin(proxies):
-        logging.warning('%s: %s not access weixin' % (check_proxy.__name__, random_proxy.address))
+        logging.warning('%s: %s access weixin failed' % (check_proxy.__name__, random_proxy.address))
         delete_proxy(random_proxy)
         return None
     logging.info('%s: %s valid' % (check_proxy.__name__, random_proxy.address))
