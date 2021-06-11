@@ -1,7 +1,7 @@
 # valid option: http, https, socks4, socks5
 # type can not be null
 # http not include https
-proxy_type = ['https', 'socks4', 'socks5']
+proxy_type = ['https', 'socks5']
 # valid option: transparent, anonymous, elite
 # anonymity can not set
 proxy_anonymity = ['anonymous', 'elite']
