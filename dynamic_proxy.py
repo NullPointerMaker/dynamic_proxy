@@ -87,18 +87,15 @@ async def conn_client(reader: StreamReader, writer: StreamWriter):
         http_headers: list[bytes] = []
         while True:
             line = await from_client.readline()
-            if line == b'\r\n':
-                break
             http_headers.append(line)
+            if not line or line == b'\r\n':
+                break
         is_connect, server_host, server_port = get_conn_prop(http_headers)
     except (IOError, ValueError) as e:
         logging.error(e)
         to_client.close()
         return
-    from_server, to_server = await conn_server(
-        server_host=server_host,
-        server_port=server_port
-    )
+    from_server, to_server = await conn_server(server_host, server_port)
     if is_connect:
         to_client.write(b'HTTP/1.1 200 Connection Established\r\n\r\n')
     else:
