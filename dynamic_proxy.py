@@ -2,6 +2,7 @@ import asyncio
 import logging
 import socket
 from asyncio import StreamReader, StreamWriter, StreamReaderProtocol
+from threading import Thread
 from typing import List
 
 import socks  # pysocks
@@ -103,7 +104,7 @@ async def conn_client(reader: StreamReader, writer: StreamWriter):
     asyncio.ensure_future(tunnel(from_client, to_client, from_server, to_server))
 
 
-rotate_proxy()
+Thread(target=rotate_proxy).start()
 event_loop = asyncio.get_event_loop()
 server = asyncio.start_server(conn_client,
                               host=config.local_host,
