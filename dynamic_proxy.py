@@ -5,6 +5,8 @@ from asyncio import StreamReader, StreamWriter
 from threading import Thread
 from typing import List
 
+from python_socks.async_.asyncio import Proxy
+
 import config
 from proxy_checker import get_checked_proxy as checked_proxy, rotate_proxy
 
@@ -41,8 +43,9 @@ async def tunnel(from_client, to_client, from_server, to_server):
 async def conn_server(server_host: str, server_port: int) -> (StreamReader, StreamWriter):
     if server_host in config.bypass_proxy:
         return await asyncio.open_connection(host=server_host, port=server_port)
-    logging.info('proxy: %s:%d' % (checked_proxy().proxy_host, checked_proxy().proxy_port))
-    sock = await checked_proxy().connect(server_host, server_port)
+    logging.info('proxy: %s' % checked_proxy())
+    proxy = Proxy().from_url(checked_proxy())
+    sock = await proxy.connect(server_host, server_port)
     return await asyncio.open_connection(sock=sock)
 
 
