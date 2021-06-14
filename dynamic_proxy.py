@@ -27,12 +27,14 @@ socket.getaddrinfo = new_getaddrinfo
 
 async def tunnel(from_client, to_client, from_server, to_server):
     async def io_copy(reader: StreamReader, writer: StreamWriter):
+        logging.debug('%s: starting' % tunnel.__name__)
         while True:
             data = await reader.read(8192)
             if not data:
                 break
             writer.write(data)
         writer.close()
+        logging.debug('%s: ending' % tunnel.__name__)
 
     asyncio.ensure_future(io_copy(from_client, to_server))
     asyncio.ensure_future(io_copy(from_server, to_client))
@@ -41,6 +43,7 @@ async def tunnel(from_client, to_client, from_server, to_server):
 async def conn_server(server_host: str, server_port: int) -> (StreamReader, StreamWriter):
     sock = socks.socksocket()
     if server_host not in config.bypass_proxy:
+        logging.info('proxy: %s:%d' % (checked_proxy()['addr'], checked_proxy()['port']))
         sock.set_proxy(**checked_proxy())
     sock.connect((server_host, server_port))
     # max packet size base on MTU of devices
@@ -93,6 +96,7 @@ async def conn_client(reader: StreamReader, writer: StreamWriter):
         logging.error(e)
         to_client.close()
         return
+    logging.info('server: %s %d' % (server_host, server_port))
     from_server, to_server = await conn_server(server_host, server_port)
     if is_connect:
         to_client.write(b'HTTP/1.1 200 Connection Established\r\n\r\n')
@@ -107,5 +111,5 @@ server = asyncio.start_server(conn_client,
                               host=config.local_host,
                               port=config.local_port)
 server = event_loop.run_until_complete(server)
-logging.info('HTTP proxy is serving at %s:%d' % (config.local_host, config.local_port))
+logging.info('HTTP proxy: %s:%d' % (config.local_host, config.local_port))
 event_loop.run_forever()
