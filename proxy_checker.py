@@ -5,22 +5,22 @@ from typing import Optional
 
 import peewee
 import requests
-import socks
+from python_socks.async_.asyncio import Proxy as CheckedProxy
 from requests import RequestException
 
 import config
 from proxy_filter import Proxy, is_valid, delete_proxy
 
-checked_proxy = {'proxy_type': socks.PROXY_TYPE_SOCKS5, 'addr': '127.0.0.1', 'port': 9050}
+checked_proxy = CheckedProxy().from_url('socks5://127.0.0.1:9050')
 
 
-def get_checked_proxy() -> dict:
+def get_checked_proxy():
     return checked_proxy
 
 
-def set_checked_proxy(**kwargs):
+def set_checked_proxy(url):
     global checked_proxy
-    checked_proxy = kwargs
+    checked_proxy = CheckedProxy().from_url(url)
 
 
 def get_local_ip() -> str:
@@ -146,14 +146,6 @@ def rotate_proxy():
     cp = None
     while not cp:
         cp = check_proxy()
-    proxy_type = 0
-    if 'http' in cp.type:
-        proxy_type = socks.PROXY_TYPE_HTTP
-    elif 'socks4' in cp.type:
-        proxy_type = socks.PROXY_TYPE_SOCKS4
-    elif 'socks5' in cp.type:
-        proxy_type = socks.PROXY_TYPE_SOCKS5
-    addr = str(cp.address).split(':')
-    port = int(addr[1])
-    set_checked_proxy(proxy_type=proxy_type, addr=addr[0], port=port)
+    url = cp.type + '://' + cp.address
+    set_checked_proxy(url)
     Timer(config.rotate_interval, rotate_proxy).start()
