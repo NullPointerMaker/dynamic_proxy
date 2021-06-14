@@ -40,15 +40,16 @@ async def tunnel(from_client, to_client, from_server, to_server):
 
 async def conn_server(server_host: str, server_port: int) -> (StreamReader, StreamWriter):
     sock = socks.socksocket()
-    sock.set_proxy(proxy_type=checked_proxy().get('type'),
-                   addr=checked_proxy().get('host'),
-                   port=checked_proxy().get('port'),
-                   username=checked_proxy().get('username'),
-                   password=checked_proxy().get('password'))
+    if server_host not in config.bypass_proxy:
+        sock.set_proxy(proxy_type=checked_proxy().get('type'),
+                       addr=checked_proxy().get('host'),
+                       port=checked_proxy().get('port'),
+                       username=checked_proxy().get('username'),
+                       password=checked_proxy().get('password'))
     sock.connect((server_host, server_port))
     # max packet size base on MTU of devices
     # the largest is 64k bytes
-    limit = 2**16
+    limit = 2 ** 16
     loop = asyncio.get_event_loop()
     from_server = StreamReader(limit=limit, loop=loop)
     protocol = StreamReaderProtocol(from_server, loop=loop)
