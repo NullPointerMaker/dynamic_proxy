@@ -146,6 +146,9 @@ def rotate_proxy():
     cp = None
     while not cp:
         cp = check_proxy()
-    url = cp.type + '://' + cp.address
+    if cp.type == 'https':
+        url = 'http://' + cp.address
+    else:
+        url = cp.type + '://' + cp.address
     set_checked_proxy(url)
     Timer(config.rotate_interval, rotate_proxy).start()
