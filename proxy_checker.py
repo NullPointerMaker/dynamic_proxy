@@ -11,7 +11,7 @@ from requests import RequestException
 import config
 from proxy_filter import Proxy, is_valid, delete_proxy
 
-checked_proxy = {'type': socks.PROXY_TYPE_SOCKS5, 'host': '127.0.0.1', 'port': 9050}
+checked_proxy = {'proxy_type': socks.PROXY_TYPE_SOCKS5, 'addr': '127.0.0.1', 'port': 9050}
 
 
 def get_checked_proxy() -> dict:
