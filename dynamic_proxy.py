@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import socket
-from asyncio import StreamReader, StreamWriter, StreamReaderProtocol
+from asyncio import StreamReader, StreamWriter
 from threading import Thread
 from typing import List
 
@@ -22,7 +22,7 @@ def new_getaddrinfo(*args, **kwargs):
             if response[0] == socket.AF_INET]
 
 
-socket.getaddrinfo = new_getaddrinfo
+socket.getaddrinfo = new_getaddrinfo  # force IPv4
 
 
 async def tunnel(from_client, to_client, from_server, to_server):
@@ -46,15 +46,7 @@ async def conn_server(server_host: str, server_port: int) -> (StreamReader, Stre
         logging.info('proxy: %s:%d' % (checked_proxy()['addr'], checked_proxy()['port']))
         sock.set_proxy(**checked_proxy())
     sock.connect((server_host, server_port))
-    # max packet size base on MTU of devices
-    # the largest is 64k bytes
-    limit = 2 ** 16
-    loop = asyncio.get_event_loop()
-    from_server = StreamReader(limit=limit, loop=loop)
-    protocol = StreamReaderProtocol(from_server, loop=loop)
-    transport, _ = await loop.create_connection(lambda: protocol, sock=sock)
-    to_server = StreamWriter(transport, protocol, from_server, loop)
-    return from_server, to_server
+    return await asyncio.open_connection(sock=sock)
 
 
 def get_conn_prop(headers: List[bytes]) -> (bool, str, int):
