@@ -56,7 +56,7 @@ def check_ssl(proxies: dict) -> bool:
         return False
 
 
-def check_anonymity(proxies: dict) -> (bool, str):
+def check_anonymity(proxies: dict) -> bool:
     logging.info(check_anonymity.__name__)
     if 'transparent' in config.proxy_anonymity:  # accept transparent
         return True
