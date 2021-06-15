@@ -86,6 +86,7 @@ def check_country(proxies: dict) -> bool:
             country = locs[0]
         else:
             logging.error('%s: cloudflare failed' % check_country.__name__)
+            logging.debug(r.text)
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0'}
             r = requests.get('http://www.whatismyip.com.tw', proxies=proxies, headers=headers, timeout=config.timeout)
             countries = re.findall(r'country="([A-Z0-9]{2})"', r.text, re.MULTILINE)
@@ -93,6 +94,7 @@ def check_country(proxies: dict) -> bool:
                 country = countries[0]
             else:
                 logging.error('%s: whatismyip failed' % check_country.__name__)
+                logging.debug(r.text)
                 return False
     except RequestException:  # bad proxy
         return False
