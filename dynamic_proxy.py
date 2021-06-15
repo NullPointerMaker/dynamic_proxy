@@ -88,7 +88,7 @@ async def conn_client(reader: StreamReader, writer: StreamWriter):
         logging.error(e)
         to_client.close()
         return
-    logging.info('server: %s %d' % (server_host, server_port))
+    logging.info('server: %s:%d' % (server_host, server_port))
     from_server, to_server = await conn_server(server_host, server_port)
     if is_connect:
         to_client.write(b'HTTP/1.1 200 Connection Established\r\n\r\n')
