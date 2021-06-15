@@ -56,7 +56,7 @@ def check_ssl(proxies: dict) -> bool:
         return False
 
 
-def check_anonymity(proxies: dict) -> bool:
+def check_anonymity(proxies: dict) -> (bool, str):
     logging.info(check_anonymity.__name__)
     if 'transparent' in config.proxy_anonymity:  # accept transparent
         return True
@@ -85,8 +85,15 @@ def check_country(proxies: dict) -> bool:
         if locs:
             country = locs[0]
         else:
-            logging.error(r.text)
-            return False
+            logging.error('%s: cloudflare failed' % check_country.__name__)
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0'}
+            r = requests.get('http://www.whatismyip.com.tw', proxies=proxies, headers=headers, timeout=config.timeout)
+            countries = re.findall(r'country="([A-Z0-9]{2})"', r.text, re.MULTILINE)
+            if countries:
+                country = countries[0]
+            else:
+                logging.error('%s: whatismyip failed' % check_country.__name__)
+                return False
     except RequestException:  # bad proxy
         return False
     if config.proxy_country and country not in config.proxy_country:
