@@ -98,13 +98,17 @@ def check_country(proxies: dict) -> bool:
     return True
 
 
-def access_weixin(proxies: dict) -> bool:
-    logging.info('%s: %s' % (access_weixin.__name__, proxies['http']))
+def check_content(proxies: dict) -> bool:
+    logging.info('%s: %s' % (check_content.__name__, proxies['http']))
     try:
-        r = requests.get('http://mp.weixin.qq.com', proxies=proxies, timeout=config.timeout)
-        if r.status_code != 200:  # api offline
-            return False
-        return 'Chrome' in r.text
+        for url in config.check_content:
+            logging.info('%s: %s from %s' % (check_content.__name__, proxies['http'], url))
+            r = requests.get(url, proxies=proxies, timeout=config.timeout)
+            if r.status_code != 200:  # api offline
+                return False
+            if config.check_content[url] not in r.text:
+                logging.debug(r.text)
+                return False
     except RequestException:  # bad proxy
         return False
 
@@ -136,8 +140,8 @@ def check_proxy() -> Optional[str]:
         logging.warning('%s: %s invalid country' % (check_proxy.__name__, proxies['http']))
         delete_proxy(random_proxy)
         return None
-    if not access_weixin(proxies):
-        logging.warning('%s: %s weixin failed' % (check_proxy.__name__, proxies['http']))
+    if not check_content(proxies):
+        logging.warning('%s: %s invalid content' % (check_proxy.__name__, proxies['http']))
         delete_proxy(random_proxy)
         return None
     logging.info('%s: %s valid' % (check_proxy.__name__, proxies['http']))

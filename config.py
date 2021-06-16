@@ -16,3 +16,4 @@ bypass_proxy = ['127.0.0.1']
 rotate_interval = 300
 timeout = 10
 check_access = ['http://twitter.com']
+check_content = {'http://mp.weixin.qq.com': 'Chrome'}
