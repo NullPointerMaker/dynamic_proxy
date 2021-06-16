@@ -29,6 +29,7 @@ def check_access(proxies: dict) -> bool:
     logging.info('%s: %s' % (check_access.__name__, proxies['http']))
     try:
         for url in config.check_access:
+            logging.info('%s: %s to %s' % (check_access.__name__, proxies['http'], url))
             r = requests.head(url, proxies=proxies, timeout=config.timeout)
             if r.status_code < 200:
                 return False
