@@ -26,7 +26,6 @@ local_ip = get_local_ip()
 
 
 def check_access(proxies: dict) -> bool:
-    logging.info('%s: %s' % (check_access.__name__, proxies['http']))
     try:
         for url in config.check_access:
             logging.info('%s: %s to %s' % (check_access.__name__, proxies['http'], url))
@@ -39,9 +38,9 @@ def check_access(proxies: dict) -> bool:
 
 
 def check_ssl(proxies: dict) -> bool:
-    logging.info('%s: %s' % (check_ssl.__name__, proxies['http']))
     if 'http' in config.proxy_type:  # accept plain
         return True
+    logging.info('%s: %s' % (check_ssl.__name__, proxies['http']))
     try:
         r = requests.head('https://httpbin.org', proxies=proxies, timeout=config.timeout)
         return r.status_code > 0
@@ -50,9 +49,9 @@ def check_ssl(proxies: dict) -> bool:
 
 
 def check_anonymity(proxies: dict) -> bool:
-    logging.info('%s: %s' % (check_anonymity.__name__, proxies['http']))
     if 'transparent' in config.proxy_anonymity:  # accept transparent
         return True
+    logging.info('%s: %s' % (check_anonymity.__name__, proxies['http']))
     try:
         r = requests.get('http://httpbin.org/anything', proxies=proxies, timeout=config.timeout)
         if 'anonymous' in config.proxy_anonymity:  # accept anonymous
@@ -69,9 +68,9 @@ def check_anonymity(proxies: dict) -> bool:
 
 
 def check_country(proxies: dict) -> bool:
-    logging.info('%s: %s' % (check_country.__name__, proxies['http']))
     if not config.proxy_country and not config.proxy_country_exclude:  # accept all countries
         return True
+    logging.info('%s: %s' % (check_country.__name__, proxies['http']))
     try:
         r = requests.get('http://api.cloudflare.com/cdn-cgi/trace', proxies=proxies, timeout=config.timeout)
         locs = re.findall(r'^loc=([A-Z0-9]{2})$', r.text, re.MULTILINE)
@@ -99,7 +98,6 @@ def check_country(proxies: dict) -> bool:
 
 
 def check_content(proxies: dict) -> bool:
-    logging.info('%s: %s' % (check_content.__name__, proxies['http']))
     try:
         for url in config.check_content:
             logging.info('%s: %s from %s' % (check_content.__name__, proxies['http'], url))
@@ -117,7 +115,7 @@ def check_proxy() -> Optional[str]:
     random_proxy: Proxy = Proxy.select().order_by(peewee.fn.Random()).get()
     logging.info('%s: %s' % (check_proxy.__name__, random_proxy.address))
     if not is_valid(random_proxy):
-        logging.warning('%s: %s not valid' % (check_proxy.__name__, random_proxy.address))
+        logging.warning('%s: %s invalid' % (check_proxy.__name__, random_proxy.address))
         delete_proxy(random_proxy)
         return None
     if 'https' == random_proxy.type:
@@ -125,7 +123,7 @@ def check_proxy() -> Optional[str]:
     proxies = {'http': random_proxy.type + '://' + random_proxy.address}
     proxies['https'] = proxies['http']
     if not check_access(proxies):
-        logging.warning('%s: %s not access' % (check_proxy.__name__, proxies['http']))
+        logging.warning('%s: %s invalid access' % (check_proxy.__name__, proxies['http']))
         delete_proxy(random_proxy)
         return None
     if not check_ssl(proxies):
