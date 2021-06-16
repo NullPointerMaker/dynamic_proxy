@@ -109,6 +109,7 @@ def check_content(proxies: dict) -> bool:
                 return False
     except RequestException:  # bad proxy
         return False
+    return True
 
 
 def check_proxy() -> Optional[str]:
