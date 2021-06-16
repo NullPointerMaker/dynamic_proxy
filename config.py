@@ -13,6 +13,6 @@ local_host = '127.0.0.1'
 local_port = 3128
 bypass_proxy = ['127.0.0.1']
 
-rotate_interval = 600
+rotate_interval = 300
 timeout = 10
 check_access = ['http://twitter.com']
