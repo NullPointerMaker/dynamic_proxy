@@ -65,6 +65,7 @@ def check_anonymity(proxies: dict) -> bool:
             return elite
     except RequestException:  # bad proxy
         return False
+    return True
 
 
 def check_country(proxies: dict) -> bool:
