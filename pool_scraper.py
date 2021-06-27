@@ -26,6 +26,9 @@ def clarketm():  # github.com/clarketm/proxy-list
         logging.info('%s: no update' % clarketm.__name__)
         return
     r = requests.get('https://github.com/clarketm/proxy-list/raw/master/proxy-list.txt')
+    if 200 != r.status_code:
+        logging.info('%s: HTTP %d' % (clarketm.__name__, r.status_code))
+        return
     lines = r.text.splitlines()[9:]
     logging.info('%s: %d proxies' % (clarketm.__name__, len(lines)))
     for line in lines:
@@ -63,6 +66,9 @@ def fate0():  # github.com/fate0/proxylist
         logging.info('%s: no update' % fate0.__name__)
         return
     r = requests.get('https://github.com/fate0/proxylist/raw/master/proxy.list')
+    if 200 != r.status_code:
+        logging.info('%s: HTTP %d' % (fate0.__name__, r.status_code))
+        return
     lines = r.text.splitlines()
     logging.info('%s: %d proxies' % (fate0.__name__, len(lines)))
     for line in lines:
@@ -99,6 +105,9 @@ def hookzof():  # github.com/hookzof/socks5_list
         logging.info('%s: no update' % hookzof.__name__)
         return
     r = requests.get('https://github.com/hookzof/socks5_list/raw/master/tg/socks.json')
+    if 200 != r.status_code:
+        logging.info('%s: HTTP %d' % (hookzof.__name__, r.status_code))
+        return
     jsons = r.json()
     logging.info('%s: %d proxies' % (hookzof.__name__, len(jsons)))
     for j in jsons:
@@ -125,6 +134,9 @@ def proxy_list_download():  # proxy-list.download
             params['country'] = setting[2]
         logging.info('%s: %s' % (proxy_list_download.__name__, str(params)))
         r = requests.get('https://www.proxy-list.download/api/v1/get', params=params)
+        if 200 != r.status_code:
+            logging.info('%s: HTTP %d' % (proxy_list_download.__name__, r.status_code))
+            return
         lines = r.text.splitlines()
         logging.info('%s: %d proxies' % (proxy_list_download.__name__, len(lines)))
         for line in lines:
@@ -156,6 +168,9 @@ def proxyscrape_com():  # proxyscrape.com
             params['country'] = ','.join(config.proxy_country)
         logging.info('%s: %s' % (proxyscrape_com.__name__, str(params)))
         r = requests.get('https://api.proxyscrape.com', params=params)
+        if 200 != r.status_code:
+            logging.info('%s: HTTP %d' % (proxyscrape_com.__name__, r.status_code))
+            return
         lines = r.text.splitlines()
         logging.info('%s: %d proxies' % (proxyscrape_com.__name__, len(lines)))
         for line in lines:
@@ -177,6 +192,9 @@ def socks_proxy_net():  # socks-proxy.net
     if 'socks4' not in config.proxy_type and 'socks5' not in config.proxy_type:
         return
     r = requests.get('https://socks-proxy.net')
+    if 200 != r.status_code:
+        logging.info('%s: HTTP %d' % (socks_proxy_net.__name__, r.status_code))
+        return
     soup = BeautifulSoup(r.text, 'html.parser')
     table = soup.find('table', attrs={'id': 'proxylisttable'})
     rows = table.find_all("tr")
