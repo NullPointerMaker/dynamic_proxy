@@ -44,9 +44,26 @@ def delete_proxy(proxy: Proxy):
         unlock()
 
 
+def is_valid_address(address: str) -> bool:
+    try:
+        r = address.split(':')
+        if len(r) != 2:
+            return False
+        port = int(r[1])
+        if port < 0 or port > 65535:
+            return False
+        for i in r[0].split('.'):
+            i = int(i)
+            if i < 0 or i > 255:
+                return False
+    except (ValueError, TypeError):
+        return False
+    return True
+
+
 def is_valid(proxy: Proxy) -> bool:
-    if 'socks' in proxy.type and not proxy.anonymity:
-        proxy.anonymity = 'elite'
+    if not is_valid_address(str(proxy.address)):
+        return False
     if proxy.type not in config.proxy_type:
         return False
     if proxy.anonymity not in config.proxy_anonymity:
@@ -59,6 +76,8 @@ def is_valid(proxy: Proxy) -> bool:
 
 
 def filter_proxy(proxy: Proxy):
+    if 'socks' in proxy.type and not proxy.anonymity:
+        proxy.anonymity = 'elite'
     if is_valid(proxy):
         lock()
         try:
