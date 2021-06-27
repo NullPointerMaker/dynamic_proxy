@@ -3,10 +3,6 @@ from datetime import datetime as Datetime
 
 import requests
 from bs4 import BeautifulSoup
-from github import Github
-from github.Commit import Commit
-from github.PaginatedList import PaginatedList
-from github.Repository import Repository
 
 import config
 from proxy_filter import Proxy, filter_proxy
@@ -21,7 +17,7 @@ def scrape_free_proxy_list_net(url: str):  # free-proxy-list.net
         return
     r = requests.get(url)
     if 200 != r.status_code:
-        logging.info('%s: HTTP %d' % (scrape_free_proxy_list_net.__name__, r.status_code))
+        logging.warning('%s: HTTP %d' % (scrape_free_proxy_list_net.__name__, r.status_code))
         return
     soup = BeautifulSoup(r.text, 'html.parser')
     table = soup.find('table', attrs={'id': 'proxylisttable'})
@@ -46,10 +42,22 @@ def is_updated(timestamp: Datetime) -> bool:
     return (now - timestamp).seconds < 3600
 
 
-def is_updated_github(repo: str, path: str) -> bool:
-    repo: Repository = Github().get_repo(repo)
-    commits: PaginatedList[Commit] = repo.get_commits(path=path)
-    return is_updated(commits[0].commit.author.date)
+def is_updated_github(url: str) -> bool:
+    url = url.replace('://github.com/', '://api.github.com/repos/')
+    url = url.replace('/raw/HEAD/', '/commits?page=1&per_page=1&path=')
+    try:
+        r = requests.get(url)
+        if 200 != r.status_code:
+            logging.warning('%s: HTTP %d' % (is_updated_github.__name__, r.status_code))
+            return False
+        commits = r.json()
+        date = commits[0]['commit']['author']['date']
+        date = date.replace('Z', '+00:00')
+        timestamp = Datetime.fromisoformat(date)
+    except (IOError, KeyError, ValueError, TypeError, AttributeError) as e:
+        logging.warning(e)
+        return False
+    return is_updated(timestamp)
 
 
 def get_type_anonymity_set() -> set:

@@ -1,5 +1,4 @@
 beautifulsoup4
 peewee
-pygithub
 python-socks[asyncio]
 requests[socks]

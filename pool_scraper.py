@@ -22,12 +22,13 @@ def clarketm():  # github.com/clarketm/proxy-list
     logging.info('%s: starting' % clarketm.__name__)
     if 'http' not in config.proxy_type and 'https' not in config.proxy_type:
         return
-    if not is_updated_github('clarketm/proxy-list', 'proxy-list.txt'):
+    url = 'https://github.com/clarketm/proxy-list/raw/HEAD/proxy-list.txt'
+    if not is_updated_github(url):
         logging.info('%s: no update' % clarketm.__name__)
         return
-    r = requests.get('https://github.com/clarketm/proxy-list/raw/master/proxy-list.txt')
+    r = requests.get(url)
     if 200 != r.status_code:
-        logging.info('%s: HTTP %d' % (clarketm.__name__, r.status_code))
+        logging.warning('%s: HTTP %d' % (clarketm.__name__, r.status_code))
         return
     lines = r.text.splitlines()[9:]
     logging.info('%s: %d proxies' % (clarketm.__name__, len(lines)))
@@ -62,12 +63,13 @@ def clarketm():  # github.com/clarketm/proxy-list
 def fate0():  # github.com/fate0/proxylist
     # as known as proxylist.fatezero.org
     logging.info('%s: starting' % fate0.__name__)
-    if not is_updated_github('fate0/proxylist', 'proxy.list'):
+    url = 'https://github.com/fate0/proxylist/raw/HEAD/proxy.list'
+    if not is_updated_github(url):
         logging.info('%s: no update' % fate0.__name__)
         return
-    r = requests.get('https://github.com/fate0/proxylist/raw/master/proxy.list')
+    r = requests.get(url)
     if 200 != r.status_code:
-        logging.info('%s: HTTP %d' % (fate0.__name__, r.status_code))
+        logging.warning('%s: HTTP %d' % (fate0.__name__, r.status_code))
         return
     lines = r.text.splitlines()
     logging.info('%s: %d proxies' % (fate0.__name__, len(lines)))
@@ -101,12 +103,13 @@ def hookzof():  # github.com/hookzof/socks5_list
     logging.info('%s: starting' % hookzof.__name__)
     if 'socks5' not in config.proxy_type:
         return
-    if not is_updated_github('hookzof/socks5_list', 'tg/socks.json'):
+    url = 'https://github.com/hookzof/socks5_list/raw/HEAD/tg/socks.json'
+    if not is_updated_github(url):
         logging.info('%s: no update' % hookzof.__name__)
         return
-    r = requests.get('https://github.com/hookzof/socks5_list/raw/master/tg/socks.json')
+    r = requests.get(url)
     if 200 != r.status_code:
-        logging.info('%s: HTTP %d' % (hookzof.__name__, r.status_code))
+        logging.warning('%s: HTTP %d' % (hookzof.__name__, r.status_code))
         return
     jsons = r.json()
     logging.info('%s: %d proxies' % (hookzof.__name__, len(jsons)))
@@ -135,7 +138,7 @@ def proxy_list_download():  # proxy-list.download
         logging.info('%s: %s' % (proxy_list_download.__name__, str(params)))
         r = requests.get('https://www.proxy-list.download/api/v1/get', params=params)
         if 200 != r.status_code:
-            logging.info('%s: HTTP %d' % (proxy_list_download.__name__, r.status_code))
+            logging.warning('%s: HTTP %d' % (proxy_list_download.__name__, r.status_code))
             return
         lines = r.text.splitlines()
         logging.info('%s: %d proxies' % (proxy_list_download.__name__, len(lines)))
@@ -169,7 +172,7 @@ def proxyscrape_com():  # proxyscrape.com
         logging.info('%s: %s' % (proxyscrape_com.__name__, str(params)))
         r = requests.get('https://api.proxyscrape.com', params=params)
         if 200 != r.status_code:
-            logging.info('%s: HTTP %d' % (proxyscrape_com.__name__, r.status_code))
+            logging.warning('%s: HTTP %d' % (proxyscrape_com.__name__, r.status_code))
             return
         lines = r.text.splitlines()
         logging.info('%s: %d proxies' % (proxyscrape_com.__name__, len(lines)))
@@ -193,7 +196,7 @@ def socks_proxy_net():  # socks-proxy.net
         return
     r = requests.get('https://socks-proxy.net')
     if 200 != r.status_code:
-        logging.info('%s: HTTP %d' % (socks_proxy_net.__name__, r.status_code))
+        logging.warning('%s: HTTP %d' % (socks_proxy_net.__name__, r.status_code))
         return
     soup = BeautifulSoup(r.text, 'html.parser')
     table = soup.find('table', attrs={'id': 'proxylisttable'})
