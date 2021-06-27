@@ -49,7 +49,7 @@ def is_updated_github(repo: str, path: str) -> bool:
     return is_updated(commits[0].commit.author.date)
 
 
-def get_2_settings() -> set:
+def get_type_anonymity_set() -> set:
     settings = set()
     for proxy_type in config.proxy_type:
         if 'socks' in proxy_type:
@@ -60,12 +60,17 @@ def get_2_settings() -> set:
     return settings
 
 
-def get_3_settings() -> set:
-    settings_2 = get_2_settings()
+type_anonymity_set = get_type_anonymity_set()
+
+
+def get_type_anonymity_country_set() -> set:
     settings = set()
-    for paras in settings_2:
+    for paras in type_anonymity_set:
         if not config.proxy_country:
             settings.add((paras[0], paras[1], ''))
         for country in config.proxy_country:
             settings.add((paras[0], paras[1], country))
     return settings
+
+
+type_anonymity_country_set = get_type_anonymity_country_set()

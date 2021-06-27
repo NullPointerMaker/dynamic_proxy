@@ -8,7 +8,8 @@ from bs4 import BeautifulSoup
 
 import config
 from proxy_filter import filter_proxy, Proxy
-from scraper_utils import scrape_free_proxy_list_net, is_updated_github, is_updated, get_2_settings, get_3_settings
+from scraper_utils import scrape_free_proxy_list_net, is_updated_github, is_updated
+from scraper_utils import type_anonymity_set, type_anonymity_country_set
 
 logging.basicConfig(level=logging.INFO)
 
@@ -116,8 +117,7 @@ def hookzof():  # github.com/hookzof/socks5_list
 
 def proxy_list_download():  # proxy-list.download
     logging.info('%s: staring' % proxy_list_download.__name__)
-    settings = get_3_settings()
-    for setting in settings:
+    for setting in type_anonymity_country_set:
         params = {'type': setting[0]}
         if setting[1]:
             params['anon'] = setting[1]
@@ -143,8 +143,7 @@ def proxy_list_download():  # proxy-list.download
 
 def proxyscrape_com():  # proxyscrape.com
     logging.info('%s: starting' % proxyscrape_com.__name__)
-    settings = get_2_settings()
-    for setting in settings:
+    for setting in type_anonymity_set:
         params = {'request': 'getproxies', 'proxytype': setting[0]}
         if 'http' == params['proxytype']:
             params['ssl'] = 'no'
