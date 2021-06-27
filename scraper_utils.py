@@ -32,7 +32,7 @@ def scrape_free_proxy_list_net(url: str):  # free-proxy-list.net
             proxy = Proxy()
             proxy.address = address.strip('&nbsp;')
             proxy.type = 'https' if 'yes' in cells[6].text.lower() else 'http'
-            proxy.anonymity = cells[4].text.lower().strip('&nbsp;').strip(' proxy')
+            proxy.anonymity = cells[4].text.lower().strip('&nbsp;').rstrip(' proxy')
             proxy.country = cells[2].text.upper().strip('&nbsp;')
             filter_proxy(proxy)
     logging.info('%s ending' % url)
