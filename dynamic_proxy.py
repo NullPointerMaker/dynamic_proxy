@@ -10,7 +10,8 @@ from python_socks.async_.asyncio import Proxy
 import config
 from proxy_checker import get_checked_proxy as checked_proxy, rotate_proxy
 
-logging.basicConfig(level=logging.INFO)
+FORMAT = '%(asctime)s %(filename)s %(lineno)d %(levelname)s %(message)s'
+logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 old_getaddrinfo = socket.getaddrinfo
 
