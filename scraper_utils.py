@@ -39,7 +39,7 @@ def scrape_free_proxy_list_net(url: str):  # free-proxy-list.net
 
 def is_updated(timestamp: Datetime) -> bool:
     now = Datetime.now()
-    return (now - timestamp).seconds < 3600
+    return (now - timestamp).total_seconds() < 3600
 
 
 def is_updated_github(url: str) -> bool:
