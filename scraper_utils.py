@@ -54,7 +54,7 @@ def is_updated_github(url: str) -> bool:
         date = commits[0]['commit']['author']['date']
         timestamp = Datetime.strptime(date, '%Y-%m-%dT%H:%M:%SZ')
     except (IOError, KeyError, ValueError, TypeError, AttributeError) as e:
-        logging.warning(e)
+        logging.exception(e)
         return False
     return is_updated(timestamp)
 
