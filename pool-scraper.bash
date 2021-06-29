@@ -10,20 +10,34 @@ function doStart() {
     rm "$name.out" "$name.err"
     bash -c "exec -a $name $command &" 1>>"$name.out" 2>>"$name.err"
   fi
-  pid=$(pidof "$name")
-  echo "$pid started"
-}
-function doStop() {
+  sleep 1
   pid=$(pidof "$name")
   if [ "$pid" ]; then
-    echo "$pid" stopped
-    kill "$pid"
+    echo "$pid started"
+  else
+    cat "$name.out" "$name.err"
+    exit 10
   fi
 }
+
+function doStop() {
+  pid=$(pidof "$name")
+  # shellcheck disable=SC2086
+  if [ "$pid" ]; then
+    kill $pid
+    while kill -0 $pid 2>/dev/null; do
+      sleep 1
+    done
+    echo "$pid stopped"
+  fi
+}
+
 trap 'onCtrlC' INT
+
 function onCtrlC() {
   doStop
 }
+
 if [ "$1" == "stop" ]; then
   doStop
   exit
@@ -32,7 +46,6 @@ elif [ "$1" == "start" ]; then
   exit
 elif [ "$1" == "restart" ]; then
   doStop
-  sleep 1
   doStart
   exit
 else
