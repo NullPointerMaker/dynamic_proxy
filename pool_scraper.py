@@ -11,7 +11,7 @@ from proxy_filter import filter_proxy, Proxy
 from scraper_utils import scrape_free_proxy_list_net, is_updated_github, is_updated
 from scraper_utils import type_anonymity_set, type_anonymity_country_set
 
-FORMAT = '%(asctime)s %(filename)s %(lineno)d %(levelname)s %(message)s'
+FORMAT = '%(asctime)s %(filename)s %(levelname)s %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 
