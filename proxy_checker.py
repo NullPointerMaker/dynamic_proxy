@@ -114,7 +114,11 @@ def check_content(proxies: dict) -> bool:
 
 
 def check_proxy() -> Optional[str]:
-    random_proxy: Proxy = Proxy.select().order_by(peewee.fn.Random()).get()
+    try:
+        random_proxy: Proxy = Proxy.select().order_by(peewee.fn.Random()).get()
+    except peewee.OperationalError as oe:
+        logging.exception(oe)
+        return None
     logging.info('%s: %s' % (check_proxy.__name__, random_proxy.address))
     if not is_valid(random_proxy):
         logging.warning('%s: %s invalid' % (check_proxy.__name__, random_proxy.address))
